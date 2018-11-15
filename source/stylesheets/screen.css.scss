@@ -61,6 +61,7 @@ html, body {
   background-color: $nav-bg;
   font-size: 13px;
   font-weight: bold;
+  border-right: 1px solid #ccc;
 
   // language selector for mobile devices
   .lang-selector {
@@ -75,7 +76,9 @@ html, body {
   .logo {
     display: block;
     max-width: 100%;
-    margin-bottom: $logo-margin;
+    margin: $logo-margin;
+    width:  calc(100% - #{2 * $logo-margin});
+    height: auto;
   }
 
   &>.search {
@@ -142,6 +145,24 @@ html, body {
     margin: 0;
     padding: 0;
     line-height: 28px;
+
+    a {
+      color: $nav-text;
+      text-decoration: none;
+      font-weight: 400;
+
+      &.toc-h2 {
+        font-size: 0.85em;
+        font-weight: 100;
+      }
+    }
+
+    a[data-title="Introduction"], a[data-title="Security"], a[data-title="A3S API"], a[data-title="Relay Server API"] {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 1em;
+      padding-top: 15px;
+    }
   }
 
   li {
@@ -547,6 +568,12 @@ html, body {
       padding: $code-annotation-padding 2em;
       color: #eee;
     }
+  }
+}
+
+.json {
+  .err {
+    color: #ccc !important;
   }
 }
 

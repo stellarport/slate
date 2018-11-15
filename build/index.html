@@ -1,0 +1,1224 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Stellarport A3S Reference</title>
+
+    <link href="images/favicon.ico" rel="icon" type="image/ico" />
+
+    <style>
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight .gh {
+  color: #999999;
+}
+.highlight .sr {
+  color: #f6aa11;
+}
+.highlight .go {
+  color: #888888;
+}
+.highlight .gp {
+  color: #555555;
+}
+.highlight .gs {
+}
+.highlight .gu {
+  color: #aaaaaa;
+}
+.highlight .nb {
+  color: #f6aa11;
+}
+.highlight .cm {
+  color: #75715e;
+}
+.highlight .cp {
+  color: #75715e;
+}
+.highlight .c1 {
+  color: #75715e;
+}
+.highlight .cs {
+  color: #75715e;
+}
+.highlight .c, .highlight .cd {
+  color: #75715e;
+}
+.highlight .err {
+  color: #960050;
+}
+.highlight .gr {
+  color: #960050;
+}
+.highlight .gt {
+  color: #960050;
+}
+.highlight .gd {
+  color: #49483e;
+}
+.highlight .gi {
+  color: #49483e;
+}
+.highlight .ge {
+  color: #49483e;
+}
+.highlight .kc {
+  color: #66d9ef;
+}
+.highlight .kd {
+  color: #66d9ef;
+}
+.highlight .kr {
+  color: #66d9ef;
+}
+.highlight .no {
+  color: #66d9ef;
+}
+.highlight .kt {
+  color: #66d9ef;
+}
+.highlight .mf {
+  color: #ae81ff;
+}
+.highlight .mh {
+  color: #ae81ff;
+}
+.highlight .il {
+  color: #ae81ff;
+}
+.highlight .mi {
+  color: #ae81ff;
+}
+.highlight .mo {
+  color: #ae81ff;
+}
+.highlight .m, .highlight .mb, .highlight .mx {
+  color: #ae81ff;
+}
+.highlight .sc {
+  color: #ae81ff;
+}
+.highlight .se {
+  color: #ae81ff;
+}
+.highlight .ss {
+  color: #ae81ff;
+}
+.highlight .sd {
+  color: #e6db74;
+}
+.highlight .s2 {
+  color: #e6db74;
+}
+.highlight .sb {
+  color: #e6db74;
+}
+.highlight .sh {
+  color: #e6db74;
+}
+.highlight .si {
+  color: #e6db74;
+}
+.highlight .sx {
+  color: #e6db74;
+}
+.highlight .s1 {
+  color: #e6db74;
+}
+.highlight .s {
+  color: #e6db74;
+}
+.highlight .na {
+  color: #a6e22e;
+}
+.highlight .nc {
+  color: #a6e22e;
+}
+.highlight .nd {
+  color: #a6e22e;
+}
+.highlight .ne {
+  color: #a6e22e;
+}
+.highlight .nf {
+  color: #a6e22e;
+}
+.highlight .vc {
+  color: #ffffff;
+}
+.highlight .nn {
+  color: #ffffff;
+}
+.highlight .nl {
+  color: #ffffff;
+}
+.highlight .ni {
+  color: #ffffff;
+}
+.highlight .bp {
+  color: #ffffff;
+}
+.highlight .vg {
+  color: #ffffff;
+}
+.highlight .vi {
+  color: #ffffff;
+}
+.highlight .nv {
+  color: #ffffff;
+}
+.highlight .w {
+  color: #ffffff;
+}
+.highlight {
+  color: #ffffff;
+}
+.highlight .n, .highlight .py, .highlight .nx {
+  color: #ffffff;
+}
+.highlight .ow {
+  color: #f92672;
+}
+.highlight .nt {
+  color: #f92672;
+}
+.highlight .k, .highlight .kv {
+  color: #f92672;
+}
+.highlight .kn {
+  color: #f92672;
+}
+.highlight .kp {
+  color: #f92672;
+}
+.highlight .o {
+  color: #f92672;
+}
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all.js"></script>
+  </head>
+
+  <body class="index" data-languages="[&quot;javascript&quot;,&quot;shell&quot;]">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" alt="Navbar" />
+      </span>
+    </a>
+    <div class="toc-wrapper">
+      <img src="images/logo.png" class="logo" alt="Logo" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="javascript">javascript</a>
+              <a href="#" data-language-name="shell">shell</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <ul id="toc" class="toc-list-h1">
+          <li>
+            <a href="#introduction" class="toc-h1 toc-link" data-title="Introduction">Introduction</a>
+          </li>
+          <li>
+            <a href="#how-it-works" class="toc-h1 toc-link" data-title="How It Works">How It Works</a>
+          </li>
+          <li>
+            <a href="#security" class="toc-h1 toc-link" data-title="Security">Security</a>
+          </li>
+          <li>
+            <a href="#response-signing" class="toc-h1 toc-link" data-title="Response Signing">Response Signing</a>
+          </li>
+          <li>
+            <a href="#notification-confirmation" class="toc-h1 toc-link" data-title="Notification Confirmation">Notification Confirmation</a>
+          </li>
+          <li>
+            <a href="#idempotency" class="toc-h1 toc-link" data-title="Idempotency">Idempotency</a>
+          </li>
+          <li>
+            <a href="#a3s-api" class="toc-h1 toc-link" data-title="A3S API">A3S API</a>
+          </li>
+          <li>
+            <a href="#getting-started" class="toc-h1 toc-link" data-title="Getting Started">Getting Started</a>
+          </li>
+          <li>
+            <a href="#sandbox-environment" class="toc-h1 toc-link" data-title="Sandbox Environment">Sandbox Environment</a>
+          </li>
+          <li>
+            <a href="#info" class="toc-h1 toc-link" data-title="Info">Info</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-info" class="toc-h2 toc-link" data-title="Get Info">Get Info</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#transactions" class="toc-h1 toc-link" data-title="Transactions">Transactions</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-transactions" class="toc-h2 toc-link" data-title="Get Transactions">Get Transactions</a>
+                  </li>
+                  <li>
+                    <a href="#get-one-transaction" class="toc-h2 toc-link" data-title="Get One Transaction">Get One Transaction</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#deposit" class="toc-h1 toc-link" data-title="Deposit">Deposit</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-deposit-instructions" class="toc-h2 toc-link" data-title="Get Deposit Instructions">Get Deposit Instructions</a>
+                  </li>
+                  <li>
+                    <a href="#inform-deposit-received" class="toc-h2 toc-link" data-title="Inform Deposit Received">Inform Deposit Received</a>
+                  </li>
+                  <li>
+                    <a href="#inform-deposit-confirmed" class="toc-h2 toc-link" data-title="Inform Deposit Confirmed">Inform Deposit Confirmed</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#withdrawal" class="toc-h1 toc-link" data-title="Withdrawal">Withdrawal</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-withdrawal-instructions" class="toc-h2 toc-link" data-title="Get Withdrawal Instructions">Get Withdrawal Instructions</a>
+                  </li>
+                  <li>
+                    <a href="#inform-withdrawal-sent" class="toc-h2 toc-link" data-title="Inform Withdrawal Sent">Inform Withdrawal Sent</a>
+                  </li>
+                  <li>
+                    <a href="#inform-withdrawal-confirmed" class="toc-h2 toc-link" data-title="Inform Withdrawal Confirmed">Inform Withdrawal Confirmed</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#relay-server-api" class="toc-h1 toc-link" data-title="Relay Server API">Relay Server API</a>
+          </li>
+          <li>
+            <a href="#getting-started-2" class="toc-h1 toc-link" data-title="Getting Started">Getting Started</a>
+          </li>
+          <li>
+            <a href="#deposit-2" class="toc-h1 toc-link" data-title="Deposit">Deposit</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#deposit-destination" class="toc-h2 toc-link" data-title="Deposit Destination">Deposit Destination</a>
+                  </li>
+                  <li>
+                    <a href="#deposit-instructions" class="toc-h2 toc-link" data-title="Deposit Instructions">Deposit Instructions</a>
+                  </li>
+                  <li>
+                    <a href="#get-deposit" class="toc-h2 toc-link" data-title="Get Deposit">Get Deposit</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#withdrawal-2" class="toc-h1 toc-link" data-title="Withdrawal">Withdrawal</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#withdrawal-instructions" class="toc-h2 toc-link" data-title="Withdrawal Instructions">Withdrawal Instructions</a>
+                  </li>
+                  <li>
+                    <a href="#get-withdrawal" class="toc-h2 toc-link" data-title="Get Withdrawal">Get Withdrawal</a>
+                  </li>
+                  <li>
+                    <a href="#send-withdrawal" class="toc-h2 toc-link" data-title="Send Withdrawal">Send Withdrawal</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#errors" class="toc-h1 toc-link" data-title="Errors">Errors</a>
+          </li>
+      </ul>
+        <ul class="toc-footer">
+            <li><a href='https://stellarport.io'>A Service By Stellarport</a></li>
+            <li><a href='https://github.com/lord/slate'>Documentation Powered by Slate</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id='introduction'>Introduction</h1>
+<p>Welcome to the Stellarport Anchor As A Service (A3S). You can use our service to connect arbitrary assets to the Stellar network.</p>
+
+<p>We have language bindings in Shell and JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<h1 id='how-it-works'>How It Works</h1>
+<p>A3S is a central hub that connects arbitraty assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a relay server. It is within the relay server, that asset specific logic is housed. Between A3S and a relay server, the full scope of connecting an asset to the Stellar network is achieved. The responsibilities are split like so:</p>
+
+<p>A3S:</p>
+
+<ul>
+<li>Issue tokens on the Stellar network.</li>
+<li>Generate withdrawal destinations (for users to send their tokens to).</li>
+<li>Sense withdrawals on the Stellar network and communicate them to the relay server.</li>
+</ul>
+
+<p>Relay Server:</p>
+
+<ul>
+<li>Generate deposit destinations (for users to send asset to).</li>
+<li>Sense deposits externally and communicate them to A3S.</li>
+<li>Execute withdrawals of asset as instructed by A3S.</li>
+</ul>
+
+<p>The full deposit/withdrawal flow is as follows:</p>
+
+<ol>
+<li>User/Client Application would like to deposit asset ABC to Stellar account XYZ and request a deposit destination from A3S.</li>
+<li>A3S will provide the destination if it has already been deposited to or ask the relay server to generate a new one if it does not yet exist.</li>
+<li>User/Client Application sends deposit to provided destination.</li>
+<li>Relay server observes that a deposit has been made and notifies A3S of the deposit amount and destination.</li>
+<li>A3S issues the appropriate amount of tokens to the corresponding Stellar wallet. </li>
+</ol>
+
+<aside class="notice">
+The token issuance complexity varies from simply 1-1 issuance to a more complex process whereby A3S may remove deposit fees (depending on the asset settings), create the receiving Stellar account by selling some of the deposited asset on the open market and funding the account with the acquired XLM. A3S also waits for trustlines to be setup, it will automatically sense a trustline addition and issue any asset owed to that account at that time.
+</aside>
+
+<ol>
+<li>User/CLient Application would like to withdraw tokens to external destination GHI and requests a withdrawal destination from A3S.</li>
+<li>A3S generates a withdrawal destination and provides it to the User/Client Application.</li>
+<li>User/Client Application sends the XYZ tokens on the Stellar network to the withdrawal destination provided by A3S.</li>
+<li>A3S automatically registers the incoming withdrawal and notifies the relay server to execute a withdrawal to destination GHI.</li>
+<li>Relay server executes the withdrawal.</li>
+</ol>
+<h1 id='security'>Security</h1><h1 id='response-signing'>Response Signing</h1>
+<blockquote>
+<p>To verify an arbitrary response from A3S or a Relay Server:</p>
+</blockquote>
+<pre class="highlight shell tab-shell"><code><span class="c"># With shell, you will have to write a script to do this.</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+
+<span class="kd">let</span> <span class="nx">verified</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">verifyPayload</span><span class="p">(</span><span class="nx">signature</span><span class="p">,</span> <span class="nx">payload</span><span class="p">,</span> <span class="nx">pubKey</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>To produce a signature using an arbitrary payload:</p>
+</blockquote>
+<pre class="highlight shell tab-shell"><code><span class="c"># With shell, you will have to write a script to do this.</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">RequestSigner</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">requrestSigner</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RequestSigner</span><span class="p">(</span><span class="s1">'SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R'</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">verifyPayload</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p><code>response</code> is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.</p>
+</blockquote>
+
+<p>A3S uses a signature scheme for verifying responses between A3S and its relay servers. Every response returned from any server should include a header like so:</p>
+
+<p><code>Signature: xxxx</code></p>
+
+<aside class="notice">
+In a real response, <code>xxxx</code> will be the base64 encoded signature of the payload by the server's secret key.
+</aside>
+
+<p>When either A3S or a relay server receives a response from its counterpart, it should verify the response before beliving it.</p>
+
+<aside class="success">
+In practice, if you use the A3S sdk, all methods have the message verification built in. You do not need to manually implement this verification unless you are making requests to A3S or a relay server not using the A3S sdk.
+</aside>
+<h1 id='notification-confirmation'>Notification Confirmation</h1>
+<p>A3S confirms all notification it receives with the relay server. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.</p>
+<h1 id='idempotency'>Idempotency</h1>
+<p>A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends to requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.</p>
+<h1 id='a3s-api'>A3S API</h1>
+<p>The A3S API is a superset of <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md">SEP0006</a>. You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.</p>
+<h1 id='getting-started'>Getting Started</h1>
+<p>If you are using javascript, download the A3S sdk and import it into your project.</p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">a3s</span>
+
+<span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+</code></pre><h1 id='sandbox-environment'>Sandbox Environment</h1>
+<blockquote>
+<p>To use the sandbox with the a3s sdk:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">useSandbox</span><span class="p">();</span>
+</code></pre>
+<blockquote>
+<p>When you a ready for production:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+</code></pre>
+<p>The A3S sandbox enviornment is available at <code>a3s-sandbox.api.stellarport.io</code>.</p>
+<h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Info"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">();</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"deposit"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"XRP"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"withdraw"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"XRP"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"types"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"default"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"dest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="s2">"optional"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+              </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ripple Address"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"dest_extra"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="s2">"optional"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+              </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tag (Optional)"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"transactions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>This endpoint retrieves basic info relating to the assets available via A3S.</p>
+<h3 id='http-request'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Info</code></p>
+<h3 id='url-parameters'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h1 id='transactions'>Transactions</h1><h2 id='get-transactions'>Get Transactions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transactions?asset_code=XRP&amp;account=GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">paging_id</span><span class="p">:</span> <span class="s2">"234"</span><span class="p">,</span>
+  <span class="na">no_older_than</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">'December 17, 1995 03:24:00'</span><span class="p">),</span>
+  <span class="na">limit</span><span class="p">:</span> <span class="mi">25</span>
+<span class="p">};</span>
+<span class="kd">let</span> <span class="nx">transactions</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transactions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">account</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"transactions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"32"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"deposit"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-13T16:34:10.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-13T17:46:21.316Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9d489efe74c46f8d3e87765d8b30056b54472a743f0541fb189ed22920bab825"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"external_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EC433768C3E7F1058852362B8E1D9F7F8E746326C38242F34E973AAFE3B88980"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deposit successfully completed."</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>A3S returns a list of transactions.</p>
+<h3 id='http-request-2'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transactions</code></p>
+<h3 id='url-parameters-2'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC).</td>
+</tr>
+<tr>
+<td>paging_id (optional)</td>
+<td>Id of the last transaction to exclude.</td>
+</tr>
+<tr>
+<td>no_older_than (optional)</td>
+<td>Only return transactions newer than.</td>
+</tr>
+<tr>
+<td>limit (optional)</td>
+<td>Number of transactions to return.</td>
+</tr>
+</tbody></table>
+<h2 id='get-one-transaction'>Get One Transaction</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transaction?id=32"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">id</span><span class="p">:</span> <span class="mi">32</span>
+<span class="p">}</span>
+<span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"transaction"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"32"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"deposit"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-13T16:34:10.000Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-13T17:46:21.316Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9d489efe74c46f8d3e87765d8b30056b54472a743f0541fb189ed22920bab825"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"external_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EC433768C3E7F1058852362B8E1D9F7F8E746326C38242F34E973AAFE3B88980"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deposit successfully completed."</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>A3S provides a specific transaction.</p>
+<h3 id='http-request-3'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transaction</code></p>
+<h3 id='url-parameters-3'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-2'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>The id of the transaction</td>
+</tr>
+<tr>
+<td>stellar_transaction_id</td>
+<td>The Stellar transaction hash of the transactions</td>
+</tr>
+<tr>
+<td>external_transaction_id</td>
+<td>The external transaction id</td>
+</tr>
+</tbody></table>
+<h1 id='deposit'>Deposit</h1><h2 id='get-deposit-instructions'>Get Deposit Instructions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit?asset_code=BTC&amp;account=GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM&amp;memo_type=text&amp;memo=memostring"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">depositInstructions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">account</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"how"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"max_amount"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Send XRP to ripple address rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb. You MUST INCLUDE THE REQUIRED TAG 5 with the deposit"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>This endpoint retrieves instructions on how to complete a deposit.</p>
+<h3 id='http-request-4'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit</code></p>
+<h3 id='url-parameters-4'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-3'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>account</td>
+<td>The destination Stellar account to send credit to.</td>
+</tr>
+<tr>
+<td>memo (optional)</td>
+<td>Memo to attach to the crediting transaction.</td>
+</tr>
+<tr>
+<td>memo_type (optional)</td>
+<td>Required if memo is specified.</td>
+</tr>
+</tbody></table>
+<h2 id='inform-deposit-received'>Inform Deposit Received</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&amp;reference=relayserverreference"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositSent</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"deposit"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pending_external"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-14T22:53:51.000Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bf29d0ee54e02287ec10823f97db2eb7566e28fe48940d6abf512e146573d24e"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1CK6KHY6MHgYvmRQ4PAafKYDrg1ejbH1cE"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Waiting for external BTC deposit."</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Usually this is called by the relay server. Informs A3S of an incoming deposit. The deposit does not need to be confirmed, A3S will store it as pending if it is not yet confirmed and will wait on confirmation for token issuance.</p>
+<h3 id='http-request-5'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Sent</code></p>
+<h3 id='url-parameters-5'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-4'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>Unique relay server reference</td>
+</tr>
+</tbody></table>
+<h2 id='inform-deposit-confirmed'>Inform Deposit Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&amp;reference=44"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"deposit"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-14T22:53:51.000Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-15T17:07:45.338Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e0f3a31292c805d2f7aa2540f64d92cd5159fb8d7df9404d4c5b3fd9faa4813b"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deposit successfully completed."</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Use this endpoint to inform A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the <a href="#inform-deposit-sent">Inform Deposit Sent</a> endpoint.</p>
+
+<p>In other words, this endpoint is only for a situation where a relay server has a deposit that it already informed A3S about that has now gone to <code>SUCCESS</code> from <code>PENDING</code>.</p>
+
+<p>In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call <a href="#inform-deposit-sent">Inform Deposit Sent</a> and A3S will issue tokens. In that case, there is no need to use this endpoint at all.</p>
+<h3 id='http-request-6'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Confirmed</code></p>
+<h3 id='url-parameters-6'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-5'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>Unique relay server reference</td>
+</tr>
+</tbody></table>
+<h1 id='withdrawal'>Withdrawal</h1><h2 id='get-withdrawal-instructions'>Get Withdrawal Instructions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBZNK6EFN3F5ZUS7BV53E2FZLYVYNNJXPR3DSZNOUD6C5W6N2QXV3PFN/Withdraw?asset_code=XRP&amp;dest=rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf&amp;dest_extra=55"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">dest_extra</span><span class="p">:</span> <span class="s1">'other_param'</span>
+<span class="p">};</span>
+<span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">depositInstructions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"account_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"memo_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"memo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QytnaQ3iCZayKjTS0EKOznqBoEIM"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>A3S provides a set of instructions for the execution of a withdrawal.</p>
+<h3 id='http-request-7'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw</code></p>
+<h3 id='url-parameters-7'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-6'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>dest</td>
+<td>The desired withdrawal destination</td>
+</tr>
+<tr>
+<td>dest_extra (optional)</td>
+<td>Another parameter to identify the withdrawal destination as required by <a href="#get-info">info</a></td>
+</tr>
+</tbody></table>
+<h2 id='inform-withdrawal-sent'>Inform Withdrawal Sent</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&amp;op_order=1"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalSent</span><span class="p">(</span><span class="nx">tx_hash</span><span class="p">,</span> <span class="nx">op_order</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"35"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"withdrawal"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pending_external"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5.0000000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4.72502625"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.27497375"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-15T18:13:28.000Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a34a69973e254c032061b4d2c85b47093738f7f13f9afdd4b3a5517919303472"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QytnaQ3iCZayKjTS0EKOznqBoEIM"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Waiting for external XRP withdrawal."</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Informs A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).</p>
+<h3 id='http-request-8'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/Withdraw/Sent</code></p>
+<h3 id='query-parameters-7'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>tx_hash</td>
+<td>The Stellar transaction hash of the withdrawal.</td>
+</tr>
+<tr>
+<td>op_order</td>
+<td>The operation order of the payment transaction.</td>
+</tr>
+</tbody></table>
+<h2 id='inform-withdrawal-confirmed'>Inform Withdrawal Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&amp;reference=44"</span>
+</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"deposit"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"asset_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_out"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amount_fee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"started_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-14T22:53:51.000Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"completed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-11-15T17:07:45.338Z"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"stellar_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e0f3a31292c805d2f7aa2540f64d92cd5159fb8d7df9404d4c5b3fd9faa4813b"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_transaction_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deposit successfully completed."</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Use this endpoint to inform A3S that a withdrawal has confirmed. Usually this is called by the relay server.</p>
+
+<p>Often, after A3S informs the relay server to execute a withdrawal via <a href="#send-withdrawal">Send Withdrawal</a>, it will get a <code>PENDING</code> response.</p>
+
+<p>Once the withdrwaal successfully completes, the relay server should use this endpoint to inform A3S that a withdrawal is now confirmed.</p>
+<h3 id='http-request-9'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw/Confirmed</code></p>
+<h3 id='url-parameters-8'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_issuer</td>
+<td>The public key of the issuing account on Stellar.</td>
+</tr>
+</tbody></table>
+<h3 id='query-parameters-8'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>Unique relay server reference to the withdrawal</td>
+</tr>
+</tbody></table>
+<h1 id='relay-server-api'>Relay Server API</h1><h1 id='getting-started-2'>Getting Started</h1>
+<p>If you are simply trying to interact with A3S and not actually run a relay server, you should never have to communicate with a relay server directly. This section is only for integrators who would like to run a relay server and interact with A3S so that they can bridge an asset to Stellar.</p>
+<h1 id='deposit-2'>Deposit</h1><h2 id='deposit-destination'>Deposit Destination</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unique_destination_reference"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>The relay server generates a new unique deposit destination and returns the reference.</p>
+<h3 id='http-request-10'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Deposit/Destination</code></p>
+<h2 id='deposit-instructions'>Deposit Instructions</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="err">//seconds</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"how"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf?dt=88"</span><span class="p">,</span><span class="w"> </span><span class="err">//concise</span><span class="w"> </span><span class="err">deposit</span><span class="w"> </span><span class="err">destination</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Send XRP to ripple address rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf. You MUST INCLUDE THE REQUIRED TAG 88 with the deposit"</span><span class="w"> </span><span class="err">//expanded</span><span class="w"> </span><span class="err">deposit</span><span class="w"> </span><span class="err">details</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Given a deposit destination, the relay server produces a set of corresponding instructions.</p>
+<h3 id='http-request-11'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Deposit/Instructions</code></p>
+<h3 id='query-parameters-9'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>The deposit destination string generated by <a href="#deposit-destination">deposit destination</a>.</td>
+</tr>
+</tbody></table>
+<h2 id='get-deposit'>Get Deposit</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">can</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="err">on</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">incomplete</span><span class="w"> </span><span class="err">transaction</span><span class="w">
+  </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"44"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PENDING"</span><span class="p">,</span><span class="w"> </span><span class="err">//PENDING</span><span class="p">,</span><span class="w"> </span><span class="err">SUCCESS</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">ERROR</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DEPOSIT"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Returns a specific deposit. This endpoint is used by A3S to confirm an incoming deposit.</p>
+
+<aside class="notice">
+There are two identifying properties on a deposit and withdrawal from a relay server,namely <code>id</code> and <code>reference</code>. <code>id</code> is the property that is viewable in the external system (e.g. a bitcoin transaction hash). Sometimes, an id may be null on an icomplete transaction. A reference MUST be specified. It is the relay server's reference to the transaction.
+</aside>
+<h3 id='http-request-12'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Deposit</code></p>
+<h3 id='query-parameters-10'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+</tbody></table>
+<h1 id='withdrawal-2'>Withdrawal</h1><h2 id='withdrawal-instructions'>Withdrawal Instructions</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="err">//seconds</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Some details about your upcoming withdrawal"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, imcomplete or missing with a <code>message</code> field as to what is incorrect.</p>
+<h3 id='http-request-13'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Withdraw/Instructions</code></p>
+<h3 id='query-parameters-11'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>dest</td>
+<td>The dest as specified in <a href="#get-info">info</a></td>
+</tr>
+<tr>
+<td>other parameters</td>
+<td>Other variable parameters as specified in <a href="#get-info">info</a></td>
+</tr>
+</tbody></table>
+<h2 id='get-withdrawal'>Get Withdrawal</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x2d746897195119a308d7c840f75c0a0f2c54ceb00cb78a0661516ba93ee29ad4"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"33"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ETH"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SUCCESS"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WITHDRAWAL"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xec0a404aaa8ca1746b5c1cbe7c99e553f96463f0"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"anchorTransactionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"27"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.00397502625"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"createdTms"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-06-11T21:35:09.184Z"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Given a withdrawal destination, provides corresponding withdrawal instructions.</p>
+<h3 id='http-request-14'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Withdrawal</code></p>
+<h3 id='url-parameters-9'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+</tbody></table>
+<h2 id='send-withdrawal'>Send Withdrawal</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">can</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="err">on</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">incomplete</span><span class="w"> </span><span class="err">transaction</span><span class="w">
+  </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"46"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PENDING"</span><span class="p">,</span><span class="w"> </span><span class="err">//PENDING</span><span class="p">,</span><span class="w"> </span><span class="err">SUCCESS</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">ERROR</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WITHDRAWAL"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"amt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5.720032"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Sends a withdrawal.</p>
+<h3 id='http-request-15'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Withdraw/Send</code></p>
+<h3 id='url-parameters-10'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>transaction_id</td>
+<td>The transaction_id on A3S that should be executed by the relay server</td>
+</tr>
+</tbody></table>
+
+<aside class="info">
+Only the transaction id is passed to this endpoint on purpose. The relay server is expected to go back and fetch the transaction from A3S and confirm its authenticity before proceeding with the withdrawal.
+</aside>
+<h1 id='errors'>Errors</h1>
+<aside class="notice">
+This error section is stored in a separate file in <code>includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files...just save them to the <code>includes</code> folder and add them to the top of your <code>index.md</code>'s frontmatter. Files are included in the order listed.
+</aside>
+
+<p>The Kittn API uses the following error codes:</p>
+
+<table><thead>
+<tr>
+<th>Error Code</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>400</td>
+<td>Bad Request -- Your request is invalid.</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Unauthorized -- Your API key is wrong.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden -- The kitten requested is hidden for administrators only.</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found -- The specified kitten could not be found.</td>
+</tr>
+<tr>
+<td>405</td>
+<td>Method Not Allowed -- You tried to access a kitten with an invalid method.</td>
+</tr>
+<tr>
+<td>406</td>
+<td>Not Acceptable -- You requested a format that isn&#39;t json.</td>
+</tr>
+<tr>
+<td>410</td>
+<td>Gone -- The kitten requested has been removed from our servers.</td>
+</tr>
+<tr>
+<td>418</td>
+<td>I&#39;m a teapot.</td>
+</tr>
+<tr>
+<td>429</td>
+<td>Too Many Requests -- You&#39;re requesting too many kittens! Slow down!</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error -- We had a problem with our server. Try again later.</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Service Unavailable -- We&#39;re temporarily offline for maintenance. Please try again later.</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="javascript">javascript</a>
+                <a href="#" data-language-name="shell">shell</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
