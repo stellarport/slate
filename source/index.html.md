@@ -2,10 +2,8 @@
 title: Stellarport A3S Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
   - javascript
+  - shell
 
 toc_footers:
   - <a href='https://stellarport.io'>A Service By Stellarport</a>
@@ -19,9 +17,9 @@ search: true
 
 # Introduction
 
-Welcome to the Stellarport Anchor As A Service (A3S)! You can use our service to connect arbitrary assets to the Stellar network.
+Welcome to the Stellarport Anchor As A Service (A3S). You can use our service to connect arbitrary assets to the Stellar network.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+We have language bindings in Shell and JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
 # How It Works
 
@@ -59,213 +57,527 @@ The token issuance complexity varies from simply 1-1 issuance to a more complex 
 
 # Security
 
-> To authorize, use this code:
+## Response Signing
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+> To verify an arbitrary response from A3S or a Relay Server:
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+# With shell, you will have to write a script to do this.
 ```
 
 ```javascript
-const kittn = require('kittn');
+const {A3S} = require('a3s');
+const a3s = new A3S();
 
-let api = kittn.authorize('meowmeowmeow');
+let verified = a3s.verifyPayload(signature, payload, pubKey);
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+> To produce a signature using an arbitrary payload:
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+```shell
+# With shell, you will have to write a script to do this.
+```
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+```javascript
+const {RequestSigner} = require('a3s');
+const requrestSigner = new RequestSigner('SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R');
 
-`Authorization: meowmeowmeow`
+let response = a3s.verifyPayload(payload, response);
+```
+
+> `response` is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.
+
+A3S uses a signature scheme for verifying responses between A3S and its relay servers. Every response returned from any server should include a header like so:
+
+`Signature: xxxx`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+In a real response, <code>xxxx</code> will be the base64 encoded signature of the payload by the server's secret key.
 </aside>
+
+When either A3S or a relay server receives a response from its counterpart, it should verify the response before beliving it.
+
+<aside class="success">
+In practice, if you use the A3S sdk, all methods have the message verification built in. You do not need to manually implement this verification unless you are making requests to A3S or a relay server not using the A3S sdk.
+</aside>
+
+## Notification Confirmation
+A3S confirms all notification it receives with the relay server. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.
+
+## Idempotency
+A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends to requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.
 
 # A3S API
 
-## Get All Kittens
+The A3S API is a superset of [SEP0006](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md). You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.
 
-```ruby
-require 'kittn'
+## Getting Started
+If you are using javascript, download the A3S sdk and import it into your project.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+```javascript
+npm install a3s
+
+const {A3S} = require('a3s');
+const a3s = new A3S();
 ```
 
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Get Info
 
 ```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Info"
 ```
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+const {A3S} = require('a3s');
+const a3s = new A3S();
+let info = await a3s.info();
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+{
+  "deposit": {
+    "XRP": {
+      "fields": {},
+      "fee_fixed": 0,
+      "min_amount": 5,
+      "fee_percent": 0,
+      "enabled": true
+    },
+    ...
   },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+  "withdraw": {
+    "XRP": {
+      "types": {
+        "default": {
+          "fields": {
+            "dest": {
+              "optional": false,
+              "description": "Ripple Address"
+            },
+            "dest_extra": {
+              "optional": true,
+              "description": "Tag (Optional)"
+            }
+          }
+        }
+      },
+      "fee_fixed": 0.25,
+      "min_amount": 25,
+      "fee_percent": 0.5,
+      "enabled": true
+    },
+    ...
+  },
+  "transactions": {
+    "enabled": true
   }
-]
+}
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves basic info relating to the assets available via A3S.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET https://a3s.api.stellarport.io/v2/Info`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
+
+## Get Deposit Instructions
+
+```shell
+curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit?asset_code=BTC&account=GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM&memo_type=text&memo=memostring"
+```
+
+```javascript
+let instructions = a3s.depositInstructions(asset_code, asset_issuer, account, options);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "how": "rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5",
+  "min_amount": 5,
+  "max_amount": null,
+  "fee_fixed": 0,
+  "fee_percent": 0,
+  "eta": 60,
+  "extra_info": {
+    "message": "Send XRP to ripple address rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb. You MUST INCLUDE THE REQUIRED TAG 5 with the deposit"
+  }
+}
+```
+
+This endpoint retrieves instructions on how to complete a deposit.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Deposit`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC)
+account | The destination Stellar account to send credit to.
+memo (optional) | Memo to attach to the crediting transaction.
+memo_type (optional) | Required if memo is specified.
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+## Get Withdrawal Instructions
+
+```shell
+curl "https://a3s.api.stellarport.io/v2/GBZNK6EFN3F5ZUS7BV53E2FZLYVYNNJXPR3DSZNOUD6C5W6N2QXV3PFN/Withdraw?asset_code=XRP&dest=rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf&dest_extra=55"
+```
+
+```javascript
+const options = {
+  dest_extra: 'other_param'
+};
+let instructions = a3s.depositInstructions(asset_code, asset_issuer, dest, options);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "account_id": "GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I",
+  "memo_type": "text",
+  "memo": "QytnaQ3iCZayKjTS0EKOznqBoEIM",
+  "min_amount": 25,
+  "fee_fixed": 0.25,
+  "fee_percent": 0.5,
+  "eta": 60,
+  "extra_info": {
+    "message": "You can optionally specify a tag as part of your ripple withdrawal."
+  }
+}
+```
+
+A3S provides a set of instructions for the execution of a withdrawal.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Withdraw`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC)
+dest  | The desired withdrawal destination
+dest_extra (optional) | Another parameter to identify the withdrawal destination as required by [info](#get-info)
+
+## Get Transactions
+```shell
+curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transactions?asset_code=XRP&account=GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I"
+```
+
+```javascript
+const options = {
+  paging_id: "234",
+  no_older_than: new Date('December 17, 1995 03:24:00'),
+  limit: 25
+};
+let transactions = a3s.transactions(asset_code, asset_issuer, account, options);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "transactions": [
+    {
+      "id": "32",
+      "kind": "deposit",
+      "status": "completed",
+      "asset_code": "XRP",
+      "amount_in": "5",
+      "amount_out": "5",
+      "amount_fee": "0",
+      "started_at": "2018-11-13T16:34:10.000Z",
+      "completed_at": "2018-11-13T17:46:21.316Z",
+      "stellar_transaction_id": "9d489efe74c46f8d3e87765d8b30056b54472a743f0541fb189ed22920bab825",
+      "external_transaction_id": "EC433768C3E7F1058852362B8E1D9F7F8E746326C38242F34E973AAFE3B88980",
+      "from": "rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5",
+      "to": "GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM",
+      "message": "Deposit successfully completed.",
+      "extra_info": {}
+    },
+  ]
+}
+```
+
+A3S returns a list of transactions.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Transactions`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC).
+paging_id (optional) | Id of the last transaction to exclude.
+no_older_than (optional) | Only return transactions newer than.
+limit (optional) | Number of transactions to return.
+
+## Get One Transaction
+
+```shell
+curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transaction?id=12345"
+```
+
+```javascript
+const options = {
+  id: 12345
+}
+let instructions = a3s.transaction(options);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "transaction": {
+    "id": "32",
+    "kind": "deposit",
+    "status": "completed",
+    "asset_code": "XRP",
+    "amount_in": "5",
+    "amount_out": "5",
+    "amount_fee": "0",
+    "started_at": "2018-11-13T16:34:10.000Z",
+    "completed_at": "2018-11-13T17:46:21.316Z",
+    "stellar_transaction_id": "9d489efe74c46f8d3e87765d8b30056b54472a743f0541fb189ed22920bab825",
+    "external_transaction_id": "EC433768C3E7F1058852362B8E1D9F7F8E746326C38242F34E973AAFE3B88980",
+    "from": "rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5",
+    "to": "GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM",
+    "message": "Deposit successfully completed.",
+    "extra_info": {}
+  }
+}
+```
+
+A3S provides a specific transaction.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>Transaction`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+id | The id of the transaction
+stellar_transaction_id | The Stellar transaction hash of the transactions
+external_transaction_id | The external transaction id
+
+## Inform Deposit Received
+
+```shell
+curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&reference=relayserverreference"
+```
+
+```javascript
+let depositTransaction = await depositSent(reference, asset_code, asset_issuer);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "id": "34",
+  "kind": "deposit",
+  "status": "completed",
+  "asset_code": "XRP",
+  "amount_in": "5",
+  "amount_out": "5",
+  "amount_fee": "0",
+  "started_at": "2018-11-14T22:53:51.000Z",
+  "completed_at": "2018-11-14T22:59:13.436Z",
+  "stellar_transaction_id": "e0f3a31292c805d2f7aa2540f64d92cd5159fb8d7df9404d4c5b3fd9faa4813b",
+  "external_transaction_id": "EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F",
+  "from": "rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5",
+  "to": "GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM",
+  "message": "Deposit successfully completed.",
+  "extra_info": {}
+}
+```
+
+Usually this is called by the relay server. Informs A3S of an incoming deposit. The deposit does not need to be confirmed, A3S will store it as pending if it is not yet confirmed and will wait on confirmation for token issuance.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Deposit`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_issuer | The public key of the issuing account on Stellar.
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC)
+reference | Unique relay server reference
+
+## A3S Template
+```shell
+curl "https://a3s.api.stellarport.io/v2/Withdraw?asset_code=XRP"
+```
+
+```javascript
+let instructions = a3s.depositInstructions(asset_code, asset_issuer, dest, options);
+```
+
+> The above command returns JSON structured like this:
+
+```json
+```
+
+A3S provides a set of instructions for the execution of a withdrawal.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/Withdraw`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC)
+
+# Relay Server API
+
+## Getting Started
+If you are simply trying to interact with A3S and not actually run a relay server, you should never have to communicate with a relay server directly. This section is only for integrators who would like to run a relay server and interact with A3S so that they can bridge an asset to Stellar.
+
+## Deposit Destination
+
+> Returns JSON structured like this:
+
+```json
+{
+  "destination": "unique_destination_string"
+}
+```
+
+The relay server generates a new unique deposit destination.
+
+### HTTP Request
+
+`GET https://your.relay.server/Deposit/Destination`
+
+## Deposit Instructions
+
+> Returns JSON structured like this:
+
+```json
+{
+  "min_amount": 5,
+  "fee_fixed": 0,
+  "fee_percent": 0,
+  "eta": 60, //seconds
+  "message": "Send XRP to ripple address rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf. You MUST INCLUDE THE REQUIRED TAG 88 with the deposit"
+}
+```
+
+Given a deposit destination, the relay server produces a set of corresponding instructions.
+
+### HTTP Request
+
+`GET https://your.relay.server/Deposit/Instructions`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+asset_code | The code of the asset being deposited (e.g. BTC)
+destination | The deposit destination string generated by [deposit destination](#deposit-destination).
+
+## Get Deposit
+
+> Returns JSON structured like this:
+
+```json
+{
+  "id": "EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F", // can be null on a incomplete transaction
+  "reference": "44",
+  "code": "XRP",
+  "status": "PENDING", //PENDING, SUCCESS or ERROR
+  "type": "DEPOSIT",
+  "to": "rPFFGozFRSjbGTq8DwEWptTjGFRPqDtTtb?dt=5",
+  "amt": "5"
+}
+```
+
+Returns a specific deposit. This endpoint is used by A3S to confirm an incoming deposit.
+
+<aside class="notice">
+There are two identifying properties on a deposit and withdrawal from a relay server,namely <code>id</code> and <code>reference</code>. <code>id</code> is the property that is viewable in the external system (e.g. a bitcoin transaction hash). Sometimes, an id may be null on an icomplete transaction. A reference MUST be specified. It is the relay server's reference to the transaction
 </aside>
 
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET https://your.relay.server/`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+asset_code | The code of the asset being deposited (e.g. BTC)
 
-## Delete a Specific Kitten
+## Relay Server Template
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
+> Returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+  "destination": "unique_destination_string"
 }
 ```
 
-This endpoint deletes a specific kitten.
+desc.
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`GET https://your.relay.server/`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
-
+asset_code | The code of the asset being deposited (e.g. BTC)
