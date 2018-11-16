@@ -102,17 +102,17 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </aside>
 
 # Notification Confirmation
-A3S confirms all notification it receives with the relay server. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.
+A3S confirms all notifications it receives with the relay servers. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.
 
 # Idempotency
-A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends to requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.
+A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends two requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.
 
 # A3S API
 
 The A3S API is a superset of [SEP0006](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md). You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.
 
 # Getting Started
-If you are using javascript, download the A3S sdk and import it into your project.
+If you are using javascript, download the `a3s` package from npm and import it into your project.
 
 ```javascript
 npm install a3s
@@ -139,7 +139,9 @@ const a3s = new A3S();
 let info = await a3s.useProd();
 ```
 
-The A3S sandbox enviornment is available at `a3s-sandbox.api.stellarport.io`.
+The A3S sandbox environment is available at `a3s-sandbox.api.stellarport.io`.
+
+The A3S production environment is available at `a3s.api.stellarport.io`.
 
 # Info
 
@@ -152,7 +154,7 @@ curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-let info = await a3s.info();
+let info = await a3s.info(assetIssuer);
 ```
 
 > The above command returns JSON structured like this:
@@ -198,7 +200,7 @@ let info = await a3s.info();
 }
 ```
 
-This endpoint retrieves basic info relating to the assets available via A3S.
+Retrieves basic info relating to the assets available via A3S for a specific issuing account.
 
 ### HTTP Request
 
@@ -248,11 +250,12 @@ let transactions = a3s.transactions(asset_code, asset_issuer, account, options);
       "to": "GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM",
       "message": "Deposit successfully completed."
     },
+    ...
   ]
 }
 ```
 
-A3S returns a list of transactions.
+Returns a list of transactions.
 
 ### HTTP Request
 
@@ -309,7 +312,7 @@ let instructions = await a3s.transaction(options);
 }
 ```
 
-A3S provides a specific transaction.
+Returns a specific transaction.
 
 ### HTTP Request
 
@@ -357,7 +360,7 @@ let instructions = await a3s.depositInstructions(asset_code, asset_issuer, accou
 }
 ```
 
-This endpoint retrieves instructions on how to complete a deposit.
+Retrieves instructions on how to complete a deposit for a specific asset to a specific Stellar account.
 
 ### HTTP Request
 
@@ -410,7 +413,9 @@ let depositTransaction = await depositSent(reference, asset_code, asset_issuer);
 }
 ```
 
-Usually this is called by the relay server. Informs A3S of an incoming deposit. The deposit does not need to be confirmed, A3S will store it as pending if it is not yet confirmed and will wait on confirmation for token issuance.
+Informs A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.
+
+If a deposit is not yet confirmed, A3S will store it as pending and will wait on confirmation before issuing any tokens on Stellar.
 
 ### HTTP Request
 
@@ -461,7 +466,7 @@ let depositTransaction = await depositConfirmed(reference, asset_code, asset_iss
 }
 ```
 
-Use this endpoint to inform A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the [Inform Deposit Sent](#inform-deposit-sent) endpoint.
+Informs A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the [Inform Deposit Sent](#inform-deposit-sent) endpoint.
 
 In other words, this endpoint is only for a situation where a relay server has a deposit that it already informed A3S about that has now gone to `SUCCESS` from `PENDING`.
 
@@ -514,7 +519,7 @@ let instructions = await a3s.depositInstructions(asset_code, asset_issuer, dest,
 }
 ```
 
-A3S provides a set of instructions for the execution of a withdrawal.
+Returns a set of instructions for the execution of a withdrawal.
 
 ### HTTP Request
 
@@ -610,7 +615,7 @@ let depositTransaction = await withdrawalConfirmed(reference, asset_code, asset_
 }
 ```
 
-Use this endpoint to inform A3S that a withdrawal has confirmed. Usually this is called by the relay server.
+Informs A3S that a withdrawal has confirmed. Usually this is called by the relay server.
 
 Often, after A3S informs the relay server to execute a withdrawal via [Send Withdrawal](#send-withdrawal), it will get a `PENDING` response.
 
@@ -650,7 +655,7 @@ If you are simply trying to interact with A3S and not actually run a relay serve
 }
 ```
 
-The relay server generates a new unique deposit destination and returns the reference.
+Generates a new unique deposit destination and returns the reference. The reference should be a string that a user will recognize as identifying a particular destination.
 
 ### HTTP Request
 
@@ -671,7 +676,7 @@ The relay server generates a new unique deposit destination and returns the refe
 }
 ```
 
-Given a deposit destination, the relay server produces a set of corresponding instructions.
+Returns a set of corresponding instructions for a specific deposit destination.
 
 ### HTTP Request
 
@@ -690,7 +695,7 @@ reference | The deposit destination string generated by [deposit destination](#d
 
 ```json
 {
-  "id": "EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F", // can be null on a incomplete transaction
+  "id": "EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F", // can be null on an incomplete transaction
   "reference": "44",
   "code": "XRP",
   "status": "PENDING", //PENDING, SUCCESS or ERROR
@@ -732,7 +737,7 @@ asset_code | The code of the asset being deposited (e.g. BTC)
 }
 ```
 
-Should return a `200` status code if the destination is valid, otherwise a `400` status code if the destination parameters are invalid, imcomplete or missing with a `message` field as to what is incorrect.
+Returns withdrawal instructions for a withdrawal destination. Should return a `200` status code if the destination is valid, otherwise a `400` status code if the destination parameters are invalid, incomplete or missing with a `message` field as to what is incorrect.
 
 ### HTTP Request
 
@@ -764,7 +769,8 @@ other parameters | Other variable parameters as specified in [info](#get-info)
   "createdTms": "2018-06-11T21:35:09.184Z"
 }
 ```
-Given a withdrawal destination, provides corresponding withdrawal instructions.
+
+Returns a withdrawal.
 
 ### HTTP Request
 
@@ -791,6 +797,7 @@ asset_code | The code of the asset being deposited (e.g. BTC)
   "amt": "5.720032"
 }
 ```
+
 Sends a withdrawal.
 
 ### HTTP Request
