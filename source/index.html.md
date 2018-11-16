@@ -23,7 +23,7 @@ We have language bindings in Shell and JavaScript. You can view code examples in
 
 # How It Works
 
-A3S is a central hub that connects arbitraty assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a Relay Server that runs the logic specific to that asset. A3S, and a Relay Server, are the connection between an asset, and the Stellar network. The responsibilities are split like so:
+A3S is a central hub that connects arbitraty assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a Relay Server that runs the logic specific to that asset. A3S, and a Relay Server, are the connection between the Stellar network and an asset. The responsibilities are split like so:
 
 A3S:
 
