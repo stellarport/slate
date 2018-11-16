@@ -82,7 +82,7 @@ let verified = a3s.verifyPayload(signature, payload, pubKey);
 const {RequestSigner} = require('a3s');
 const requrestSigner = new RequestSigner('SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R');
 
-let response = a3s.verifyPayload(payload, response);
+let response = a3s.sign(payload, response);
 ```
 
 > `response` is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.
