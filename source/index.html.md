@@ -49,7 +49,7 @@ The full deposit/withdrawal flow is as follows:
 This is a simple case, describing a 1-to-1 issuance. A3S features certain flexibilites, too. A3S may remove deposit fees (depending on the asset settings). A3S may create the receiving Stellar account by selling some of the deposited asset on the open market to initially fund the account with the acquired XLM. A3S will also wait and sense for a trustline to be set up, and then issue the balance of the asset due the account.
 </aside>
 
-6. User/CLient Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.
+6. User/Client Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.
 7. A3S generates withdrawal destination and provides it to User/Client Application.
 8. User/Client Application sends ABC tokens on the Stellar network to withdrawal destination provided by A3S.
 9. A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.
