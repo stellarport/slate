@@ -39,21 +39,21 @@ Relay Server:
 
 The full deposit/withdrawal flow is as follows:
 
-1. User/Client Application would like to deposit asset ABC to Stellar account XYZ. It requests a deposit destination from A3S.
-2. A3S provides the deposit destination if it has been previously used for a deposit, or it makes a request from the relay server to generate a new one.
+1. User/Client Application would like to deposit asset ABC to Stellar account XYZ. It requests deposit destination from A3S.
+2. A3S provides deposit destination if it has been previously used for a deposit, or it makes a request from relay server to generate a new one.
 3. User/Client Application sends deposit to provided deposit destination.
-4. Relay server observes that a deposit has been made, and notifies A3S of the deposit destination and amount.
-5. A3S issues the appropriate amount of tokens to Stellar account XYZ. 
+4. Relay server observes deposit has been made, and notifies A3S of deposit destination and amount.
+5. A3S issues appropriate amount of tokens to Stellar account XYZ. 
 
 <aside class="notice">
 This is a simple case, describing a 1-to-1 issuance. A3S features certain flexibilites, too. A3S may remove deposit fees (depending on the asset settings). A3S may create the receiving Stellar account by selling some of the deposited asset on the open market to initially fund the account with the acquired XLM. A3S will also wait and sense for a trustline to be set up, and then issue the balance of the asset due the account.
 </aside>
 
-6. User/CLient Application would like to withdraw asset ABC to external account GHI. User/Client Application requests a withdrawal destination from A3S.
-7. A3S generates a withdrawal destination and provides it to the User/Client Application.
-8. User/Client Application sends ABC tokens on the Stellar network to the withdrawal destination provided by A3S.
-9. A3S automatically registers the incoming withdrawal, and notifies the relay server to execute a withdrawal to external account GHI.
-10. Relay server executes the withdrawal.
+6. User/CLient Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.
+7. A3S generates withdrawal destination and provides it to User/Client Application.
+8. User/Client Application sends ABC tokens on the Stellar network to withdrawal destination provided by A3S.
+9. A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.
+10. Relay server executes withdrawal to external account GHI.
 
 # Security
 
