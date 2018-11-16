@@ -422,13 +422,13 @@ In a real response, <code>xxxx</code> will be the base64 encoded signature of th
 In practice, if you use the A3S sdk, all methods have the message verification built in. You do not need to manually implement this verification unless you are making requests to A3S or a relay server not using the A3S sdk.
 </aside>
 <h1 id='notification-confirmation'>Notification Confirmation</h1>
-<p>A3S confirms all notification it receives with the relay server. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.</p>
+<p>A3S confirms all notifications it receives with the relay servers. For example, if A3S receives a notification to issue a deposit, it confirms this deposit with the relay server before continuing. Relay servers should implement similar rules. Never believe a message coming in over the wire, always confirm.</p>
 <h1 id='idempotency'>Idempotency</h1>
-<p>A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends to requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.</p>
+<p>A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends two requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.</p>
 <h1 id='a3s-api'>A3S API</h1>
 <p>The A3S API is a superset of <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md">SEP0006</a>. You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.</p>
 <h1 id='getting-started'>Getting Started</h1>
-<p>If you are using javascript, download the A3S sdk and import it into your project.</p>
+<p>If you are using javascript, download the <code>a3s</code> package from npm and import it into your project.</p>
 <pre class="highlight javascript tab-javascript"><code><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">a3s</span>
 
 <span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
@@ -448,11 +448,13 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
 <span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
 </code></pre>
-<p>The A3S sandbox enviornment is available at <code>a3s-sandbox.api.stellarport.io</code>.</p>
+<p>The A3S sandbox environment is available at <code>a3s-sandbox.api.stellarport.io</code>.</p>
+
+<p>The A3S production environment is available at <code>a3s.api.stellarport.io</code>.</p>
 <h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Info"</span>
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -496,7 +498,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>This endpoint retrieves basic info relating to the assets available via A3S.</p>
+<p>Retrieves basic info relating to the assets available via A3S for a specific issuing account.</p>
 <h3 id='http-request'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Info</code></p>
 <h3 id='url-parameters'>URL Parameters</h3>
@@ -540,10 +542,11 @@ In practice, if you use the A3S sdk, all methods have the message verification b
       </span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM"</span><span class="p">,</span><span class="w">
       </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deposit successfully completed."</span><span class="w">
     </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>A3S returns a list of transactions.</p>
+<p>Returns a list of transactions.</p>
 <h3 id='http-request-2'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transactions</code></p>
 <h3 id='url-parameters-2'>URL Parameters</h3>
@@ -610,7 +613,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>A3S provides a specific transaction.</p>
+<p>Returns a specific transaction.</p>
 <h3 id='http-request-3'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transaction</code></p>
 <h3 id='url-parameters-3'>URL Parameters</h3>
@@ -663,7 +666,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>This endpoint retrieves instructions on how to complete a deposit.</p>
+<p>Retrieves instructions on how to complete a deposit for a specific asset to a specific Stellar account.</p>
 <h3 id='http-request-4'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit</code></p>
 <h3 id='url-parameters-4'>URL Parameters</h3>
@@ -726,7 +729,9 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Usually this is called by the relay server. Informs A3S of an incoming deposit. The deposit does not need to be confirmed, A3S will store it as pending if it is not yet confirmed and will wait on confirmation for token issuance.</p>
+<p>Informs A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.</p>
+
+<p>If a deposit is not yet confirmed, A3S will store it as pending and will wait on confirmation before issuing any tokens on Stellar.</p>
 <h3 id='http-request-5'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Sent</code></p>
 <h3 id='url-parameters-5'>URL Parameters</h3>
@@ -781,7 +786,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Use this endpoint to inform A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the <a href="#inform-deposit-sent">Inform Deposit Sent</a> endpoint.</p>
+<p>Informs A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the <a href="#inform-deposit-sent">Inform Deposit Sent</a> endpoint.</p>
 
 <p>In other words, this endpoint is only for a situation where a relay server has a deposit that it already informed A3S about that has now gone to <code>SUCCESS</code> from <code>PENDING</code>.</p>
 
@@ -836,7 +841,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>A3S provides a set of instructions for the execution of a withdrawal.</p>
+<p>Returns a set of instructions for the execution of a withdrawal.</p>
 <h3 id='http-request-7'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw</code></p>
 <h3 id='url-parameters-7'>URL Parameters</h3>
@@ -937,7 +942,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Use this endpoint to inform A3S that a withdrawal has confirmed. Usually this is called by the relay server.</p>
+<p>Informs A3S that a withdrawal has confirmed. Usually this is called by the relay server.</p>
 
 <p>Often, after A3S informs the relay server to execute a withdrawal via <a href="#send-withdrawal">Send Withdrawal</a>, it will get a <code>PENDING</code> response.</p>
 
@@ -982,7 +987,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unique_destination_reference"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>The relay server generates a new unique deposit destination and returns the reference.</p>
+<p>Generates a new unique deposit destination and returns the reference. The reference should be a string that a user will recognize as identifying a particular destination.</p>
 <h3 id='http-request-10'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Deposit/Destination</code></p>
 <h2 id='deposit-instructions'>Deposit Instructions</h2>
@@ -998,7 +1003,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Send XRP to ripple address rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf. You MUST INCLUDE THE REQUIRED TAG 88 with the deposit"</span><span class="w"> </span><span class="err">//expanded</span><span class="w"> </span><span class="err">deposit</span><span class="w"> </span><span class="err">details</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Given a deposit destination, the relay server produces a set of corresponding instructions.</p>
+<p>Returns a set of corresponding instructions for a specific deposit destination.</p>
 <h3 id='http-request-11'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Deposit/Instructions</code></p>
 <h3 id='query-parameters-9'>Query Parameters</h3>
@@ -1022,7 +1027,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>Returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">can</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="err">on</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">incomplete</span><span class="w"> </span><span class="err">transaction</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EB8A04D87FB6C767A76B0F2C07848BB522529EED48BDC38144EE3CCF3730502F"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">can</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="err">on</span><span class="w"> </span><span class="err">an</span><span class="w"> </span><span class="err">incomplete</span><span class="w"> </span><span class="err">transaction</span><span class="w">
   </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"44"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XRP"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PENDING"</span><span class="p">,</span><span class="w"> </span><span class="err">//PENDING</span><span class="p">,</span><span class="w"> </span><span class="err">SUCCESS</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">ERROR</span><span class="w">
@@ -1062,7 +1067,7 @@ There are two identifying properties on a deposit and withdrawal from a relay se
   </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Some details about your upcoming withdrawal"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, imcomplete or missing with a <code>message</code> field as to what is incorrect.</p>
+<p>Returns withdrawal instructions for a withdrawal destination. Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, incomplete or missing with a <code>message</code> field as to what is incorrect.</p>
 <h3 id='http-request-13'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Withdraw/Instructions</code></p>
 <h3 id='query-parameters-11'>Query Parameters</h3>
@@ -1101,7 +1106,7 @@ There are two identifying properties on a deposit and withdrawal from a relay se
   </span><span class="s2">"createdTms"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2018-06-11T21:35:09.184Z"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Given a withdrawal destination, provides corresponding withdrawal instructions.</p>
+<p>Returns a withdrawal.</p>
 <h3 id='http-request-14'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Withdrawal</code></p>
 <h3 id='url-parameters-9'>URL Parameters</h3>
@@ -1171,36 +1176,36 @@ This error section is stored in a separate file in <code>includes/_errors.md</co
 <td>Bad Request -- Your request is invalid.</td>
 </tr>
 <tr>
-<td>401</td>
+<td># 401</td>
 <td>Unauthorized -- Your API key is wrong.</td>
 </tr>
 <tr>
-<td>403</td>
+<td># 403</td>
 <td>Forbidden -- The kitten requested is hidden for administrators only.</td>
 </tr>
 <tr>
 <td>404</td>
-<td>Not Found -- The specified kitten could not be found.</td>
+<td>Not Found -- The specified resource could not be found.</td>
 </tr>
 <tr>
-<td>405</td>
+<td># 405</td>
 <td>Method Not Allowed -- You tried to access a kitten with an invalid method.</td>
 </tr>
 <tr>
-<td>406</td>
+<td># 406</td>
 <td>Not Acceptable -- You requested a format that isn&#39;t json.</td>
 </tr>
 <tr>
-<td>410</td>
+<td># 410</td>
 <td>Gone -- The kitten requested has been removed from our servers.</td>
 </tr>
 <tr>
-<td>418</td>
+<td># 418</td>
 <td>I&#39;m a teapot.</td>
 </tr>
 <tr>
 <td>429</td>
-<td>Too Many Requests -- You&#39;re requesting too many kittens! Slow down!</td>
+<td>Too Many Requests -- You&#39;ve requested too many times! Slow down!</td>
 </tr>
 <tr>
 <td>500</td>
