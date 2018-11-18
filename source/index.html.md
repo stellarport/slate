@@ -381,7 +381,7 @@ account | The destination Stellar account to send credit to.
 memo (optional) | Memo to attach to the crediting transaction.
 memo_type (optional) | Required if memo is specified.
 
-## Inform Deposit Received
+## Notify Deposit Received
 
 ```shell
 curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&reference=relayserverreference"
@@ -413,7 +413,7 @@ let depositTransaction = await depositSent(reference, asset_code, asset_issuer);
 }
 ```
 
-Informs A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.
+Notifies A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.
 
 If a deposit is not yet confirmed, A3S will store it as pending and will wait on confirmation before issuing any tokens on Stellar.
 
@@ -434,7 +434,7 @@ Parameter | Description
 asset_code | The code of the asset being deposited (e.g. BTC)
 reference | Unique relay server reference
 
-## Inform Deposit Confirmed
+## Notify Deposit Confirmed
 
 ```shell
 curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&reference=44"
@@ -466,11 +466,11 @@ let depositTransaction = await depositConfirmed(reference, asset_code, asset_iss
 }
 ```
 
-Informs A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the [Inform Deposit Sent](#inform-deposit-sent) endpoint.
+Notifies A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the [Notify Deposit Sent](#notify-deposit-sent) endpoint.
 
-In other words, this endpoint is only for a situation where a relay server has a deposit that it already informed A3S about that has now gone to `SUCCESS` from `PENDING`.
+In other words, this endpoint is only for a situation where a relay server has a deposit that it already notified A3S about that has now gone to `SUCCESS` from `PENDING`.
 
-In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call [Inform Deposit Sent](#inform-deposit-sent) and A3S will issue tokens. In that case, there is no need to use this endpoint at all.
+In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call [Notify Deposit Sent](#notify-deposit-sent) and A3S will issue tokens. In that case, there is no need to use this endpoint at all.
 
 ### HTTP Request
 
@@ -539,7 +539,7 @@ asset_code | The code of the asset being deposited (e.g. BTC)
 dest  | The desired withdrawal destination
 dest_extra (optional) | Another parameter to identify the withdrawal destination as required by [info](#get-info)
 
-## Inform Withdrawal Sent
+## Notify Withdrawal Sent
 
 ```shell
 curl "https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&op_order=1"
@@ -570,7 +570,7 @@ let depositTransaction = await withdrawalSent(tx_hash, op_order);
 }
 ```
 
-Informs A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).
+Notifies A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).
 
 ### HTTP Request
 
@@ -583,7 +583,7 @@ Parameter | Description
 tx_hash | The Stellar transaction hash of the withdrawal.
 op_order | The operation order of the payment transaction.
 
-## Inform Withdrawal Confirmed
+## Notify Withdrawal Confirmed
 
 ```shell
 curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&reference=44"
@@ -615,11 +615,11 @@ let depositTransaction = await withdrawalConfirmed(reference, asset_code, asset_
 }
 ```
 
-Informs A3S that a withdrawal has confirmed. Usually this is called by the relay server.
+Notifies A3S that a withdrawal has confirmed. Usually this is called by the relay server.
 
-Often, after A3S informs the relay server to execute a withdrawal via [Send Withdrawal](#send-withdrawal), it will get a `PENDING` response.
+Often, after A3S notifies the relay server to execute a withdrawal via [Send Withdrawal](#send-withdrawal), it will get a `PENDING` response.
 
-Once the withdrwaal successfully completes, the relay server should use this endpoint to inform A3S that a withdrawal is now confirmed.
+Once the withdrwaal successfully completes, the relay server should use this endpoint to notify A3S that a withdrawal is now confirmed.
 
 ### HTTP Request
 
@@ -642,6 +642,8 @@ reference | Unique relay server reference to the withdrawal
 
 # Getting Started
 If you are simply trying to interact with A3S and not actually run a relay server, you should never have to communicate with a relay server directly. This section is only for integrators who would like to run a relay server and interact with A3S so that they can bridge an asset to Stellar.
+
+To get started building a relay server, you can check out our [relay-server-skeleton](https://github.com/stellarport/relay-server-skeleton)
 
 # Deposit
 

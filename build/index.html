@@ -274,10 +274,10 @@
                     <a href="#get-deposit-instructions" class="toc-h2 toc-link" data-title="Get Deposit Instructions">Get Deposit Instructions</a>
                   </li>
                   <li>
-                    <a href="#inform-deposit-received" class="toc-h2 toc-link" data-title="Inform Deposit Received">Inform Deposit Received</a>
+                    <a href="#notify-deposit-received" class="toc-h2 toc-link" data-title="Notify Deposit Received">Notify Deposit Received</a>
                   </li>
                   <li>
-                    <a href="#inform-deposit-confirmed" class="toc-h2 toc-link" data-title="Inform Deposit Confirmed">Inform Deposit Confirmed</a>
+                    <a href="#notify-deposit-confirmed" class="toc-h2 toc-link" data-title="Notify Deposit Confirmed">Notify Deposit Confirmed</a>
                   </li>
               </ul>
           </li>
@@ -288,10 +288,10 @@
                     <a href="#get-withdrawal-instructions" class="toc-h2 toc-link" data-title="Get Withdrawal Instructions">Get Withdrawal Instructions</a>
                   </li>
                   <li>
-                    <a href="#inform-withdrawal-sent" class="toc-h2 toc-link" data-title="Inform Withdrawal Sent">Inform Withdrawal Sent</a>
+                    <a href="#notify-withdrawal-sent" class="toc-h2 toc-link" data-title="Notify Withdrawal Sent">Notify Withdrawal Sent</a>
                   </li>
                   <li>
-                    <a href="#inform-withdrawal-confirmed" class="toc-h2 toc-link" data-title="Inform Withdrawal Confirmed">Inform Withdrawal Confirmed</a>
+                    <a href="#notify-withdrawal-confirmed" class="toc-h2 toc-link" data-title="Notify Withdrawal Confirmed">Notify Withdrawal Confirmed</a>
                   </li>
               </ul>
           </li>
@@ -346,7 +346,7 @@
 
 <p>We have language bindings in Shell and JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
 <h1 id='how-it-works'>How It Works</h1>
-<p>A3S is a central hub that connects arbitraty assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a relay server. It is within the relay server, that asset specific logic is housed. Between A3S and a relay server, the full scope of connecting an asset to the Stellar network is achieved. The responsibilities are split like so:</p>
+<p>A3S is a central hub that connects arbitraty assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a Relay Server that runs the logic specific to that asset. A3S, and a Relay Server, are the connection between the Stellar network and an asset. The responsibilities are split like so:</p>
 
 <p>A3S:</p>
 
@@ -367,23 +367,23 @@
 <p>The full deposit/withdrawal flow is as follows:</p>
 
 <ol>
-<li>User/Client Application would like to deposit asset ABC to Stellar account XYZ and request a deposit destination from A3S.</li>
-<li>A3S will provide the destination if it has already been deposited to or ask the relay server to generate a new one if it does not yet exist.</li>
-<li>User/Client Application sends deposit to provided destination.</li>
-<li>Relay server observes that a deposit has been made and notifies A3S of the deposit amount and destination.</li>
-<li>A3S issues the appropriate amount of tokens to the corresponding Stellar wallet. </li>
+<li>User/Client Application would like to deposit asset ABC to Stellar account XYZ. It requests deposit destination from A3S.</li>
+<li>A3S provides deposit destination if it has been previously used for a deposit, or it makes a request from relay server to generate a new one.</li>
+<li>User/Client Application sends deposit to provided deposit destination.</li>
+<li>Relay server observes deposit has been made, and notifies A3S of deposit destination and amount.</li>
+<li>A3S issues appropriate amount of tokens to Stellar account XYZ. </li>
 </ol>
 
 <aside class="notice">
-The token issuance complexity varies from simply 1-1 issuance to a more complex process whereby A3S may remove deposit fees (depending on the asset settings), create the receiving Stellar account by selling some of the deposited asset on the open market and funding the account with the acquired XLM. A3S also waits for trustlines to be setup, it will automatically sense a trustline addition and issue any asset owed to that account at that time.
+This is a simple case, describing a 1-to-1 issuance. A3S features certain flexibilites, too. A3S may remove deposit fees (depending on the asset settings). A3S may create the receiving Stellar account by selling some of the deposited asset on the open market to initially fund the account with the acquired XLM. A3S will also wait and sense for a trustline to be set up, and then issue the balance of the asset due the account.
 </aside>
 
 <ol>
-<li>User/CLient Application would like to withdraw tokens to external destination GHI and requests a withdrawal destination from A3S.</li>
-<li>A3S generates a withdrawal destination and provides it to the User/Client Application.</li>
-<li>User/Client Application sends the XYZ tokens on the Stellar network to the withdrawal destination provided by A3S.</li>
-<li>A3S automatically registers the incoming withdrawal and notifies the relay server to execute a withdrawal to destination GHI.</li>
-<li>Relay server executes the withdrawal.</li>
+<li>User/Client Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.</li>
+<li>A3S generates withdrawal destination and provides it to User/Client Application.</li>
+<li>User/Client Application sends ABC tokens on the Stellar network to withdrawal destination provided by A3S.</li>
+<li>A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.</li>
+<li>Relay server executes withdrawal to external account GHI.</li>
 </ol>
 <h1 id='security'>Security</h1><h1 id='response-signing'>Response Signing</h1>
 <blockquote>
@@ -402,7 +402,7 @@ The token issuance complexity varies from simply 1-1 issuance to a more complex 
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">RequestSigner</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">requrestSigner</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RequestSigner</span><span class="p">(</span><span class="s1">'SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R'</span><span class="p">);</span>
 
-<span class="kd">let</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">verifyPayload</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p><code>response</code> is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.</p>
@@ -705,7 +705,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Required if memo is specified.</td>
 </tr>
 </tbody></table>
-<h2 id='inform-deposit-received'>Inform Deposit Received</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&amp;reference=relayserverreference"</span>
+<h2 id='notify-deposit-received'>Notify Deposit Received</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&amp;reference=relayserverreference"</span>
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositSent</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
@@ -729,7 +729,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Informs A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.</p>
+<p>Notifies A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.</p>
 
 <p>If a deposit is not yet confirmed, A3S will store it as pending and will wait on confirmation before issuing any tokens on Stellar.</p>
 <h3 id='http-request-5'>HTTP Request</h3>
@@ -762,7 +762,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Unique relay server reference</td>
 </tr>
 </tbody></table>
-<h2 id='inform-deposit-confirmed'>Inform Deposit Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&amp;reference=44"</span>
+<h2 id='notify-deposit-confirmed'>Notify Deposit Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&amp;reference=44"</span>
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
@@ -786,11 +786,11 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Informs A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the <a href="#inform-deposit-sent">Inform Deposit Sent</a> endpoint.</p>
+<p>Notifies A3S that a deposit has confirmed. Usually this is called by the relay server. Only use this after the <a href="#notify-deposit-sent">Notify Deposit Sent</a> endpoint.</p>
 
-<p>In other words, this endpoint is only for a situation where a relay server has a deposit that it already informed A3S about that has now gone to <code>SUCCESS</code> from <code>PENDING</code>.</p>
+<p>In other words, this endpoint is only for a situation where a relay server has a deposit that it already notified A3S about that has now gone to <code>SUCCESS</code> from <code>PENDING</code>.</p>
 
-<p>In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call <a href="#inform-deposit-sent">Inform Deposit Sent</a> and A3S will issue tokens. In that case, there is no need to use this endpoint at all.</p>
+<p>In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call <a href="#notify-deposit-sent">Notify Deposit Sent</a> and A3S will issue tokens. In that case, there is no need to use this endpoint at all.</p>
 <h3 id='http-request-6'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Confirmed</code></p>
 <h3 id='url-parameters-6'>URL Parameters</h3>
@@ -876,7 +876,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Another parameter to identify the withdrawal destination as required by <a href="#get-info">info</a></td>
 </tr>
 </tbody></table>
-<h2 id='inform-withdrawal-sent'>Inform Withdrawal Sent</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&amp;op_order=1"</span>
+<h2 id='notify-withdrawal-sent'>Notify Withdrawal Sent</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&amp;op_order=1"</span>
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalSent</span><span class="p">(</span><span class="nx">tx_hash</span><span class="p">,</span> <span class="nx">op_order</span><span class="p">);</span>
 </code></pre>
 <blockquote>
@@ -899,7 +899,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Informs A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).</p>
+<p>Notifies A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).</p>
 <h3 id='http-request-8'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/Withdraw/Sent</code></p>
 <h3 id='query-parameters-7'>Query Parameters</h3>
@@ -918,7 +918,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>The operation order of the payment transaction.</td>
 </tr>
 </tbody></table>
-<h2 id='inform-withdrawal-confirmed'>Inform Withdrawal Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&amp;reference=44"</span>
+<h2 id='notify-withdrawal-confirmed'>Notify Withdrawal Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&amp;reference=44"</span>
 </code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
@@ -942,11 +942,11 @@ In practice, if you use the A3S sdk, all methods have the message verification b
   </span><span class="s2">"extra_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Informs A3S that a withdrawal has confirmed. Usually this is called by the relay server.</p>
+<p>Notifies A3S that a withdrawal has confirmed. Usually this is called by the relay server.</p>
 
-<p>Often, after A3S informs the relay server to execute a withdrawal via <a href="#send-withdrawal">Send Withdrawal</a>, it will get a <code>PENDING</code> response.</p>
+<p>Often, after A3S notifies the relay server to execute a withdrawal via <a href="#send-withdrawal">Send Withdrawal</a>, it will get a <code>PENDING</code> response.</p>
 
-<p>Once the withdrwaal successfully completes, the relay server should use this endpoint to inform A3S that a withdrawal is now confirmed.</p>
+<p>Once the withdrwaal successfully completes, the relay server should use this endpoint to notify A3S that a withdrawal is now confirmed.</p>
 <h3 id='http-request-9'>HTTP Request</h3>
 <p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw/Confirmed</code></p>
 <h3 id='url-parameters-8'>URL Parameters</h3>
@@ -979,6 +979,8 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </tbody></table>
 <h1 id='relay-server-api'>Relay Server API</h1><h1 id='getting-started-2'>Getting Started</h1>
 <p>If you are simply trying to interact with A3S and not actually run a relay server, you should never have to communicate with a relay server directly. This section is only for integrators who would like to run a relay server and interact with A3S so that they can bridge an asset to Stellar.</p>
+
+<p>To get started building a relay server, you can check out our <a href="https://github.com/stellarport/relay-server-skeleton">relay-server-skeleton</a></p>
 <h1 id='deposit-2'>Deposit</h1><h2 id='deposit-destination'>Deposit Destination</h2>
 <blockquote>
 <p>Returns JSON structured like this:</p>
@@ -1176,32 +1178,8 @@ This error section is stored in a separate file in <code>includes/_errors.md</co
 <td>Bad Request -- Your request is invalid.</td>
 </tr>
 <tr>
-<td># 401</td>
-<td>Unauthorized -- Your API key is wrong.</td>
-</tr>
-<tr>
-<td># 403</td>
-<td>Forbidden -- The kitten requested is hidden for administrators only.</td>
-</tr>
-<tr>
 <td>404</td>
 <td>Not Found -- The specified resource could not be found.</td>
-</tr>
-<tr>
-<td># 405</td>
-<td>Method Not Allowed -- You tried to access a kitten with an invalid method.</td>
-</tr>
-<tr>
-<td># 406</td>
-<td>Not Acceptable -- You requested a format that isn&#39;t json.</td>
-</tr>
-<tr>
-<td># 410</td>
-<td>Gone -- The kitten requested has been removed from our servers.</td>
-</tr>
-<tr>
-<td># 418</td>
-<td>I&#39;m a teapot.</td>
 </tr>
 <tr>
 <td>429</td>
