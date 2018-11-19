@@ -272,6 +272,7 @@ asset_issuer | The public key of the issuing account on Stellar.
 Parameter | Description
 --------- | -----------
 asset_code | The code of the asset being deposited (e.g. BTC).
+account | The id of the account to fetch transactions for.
 paging_id (optional) | Id of the last transaction to exclude.
 no_older_than (optional) | Only return transactions newer than.
 limit (optional) | Number of transactions to return.
