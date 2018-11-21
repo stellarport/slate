@@ -228,6 +228,9 @@
             <a href="#how-it-works" class="toc-h1 toc-link" data-title="How It Works">How It Works</a>
           </li>
           <li>
+            <a href="#rate-limiting" class="toc-h1 toc-link" data-title="Rate Limiting">Rate Limiting</a>
+          </li>
+          <li>
             <a href="#security" class="toc-h1 toc-link" data-title="Security">Security</a>
           </li>
           <li>
@@ -319,6 +322,9 @@
             <a href="#withdrawal-2" class="toc-h1 toc-link" data-title="Withdrawal">Withdrawal</a>
               <ul class="toc-list-h2">
                   <li>
+                    <a href="#withdrawal-destination" class="toc-h2 toc-link" data-title="Withdrawal Destination">Withdrawal Destination</a>
+                  </li>
+                  <li>
                     <a href="#withdrawal-instructions" class="toc-h2 toc-link" data-title="Withdrawal Instructions">Withdrawal Instructions</a>
                   </li>
                   <li>
@@ -385,6 +391,10 @@ This is a simple case, describing a 1-to-1 issuance. A3S features certain flexib
 <li>A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.</li>
 <li>Relay server executes withdrawal to external account GHI.</li>
 </ol>
+<h1 id='rate-limiting'>Rate Limiting</h1>
+<p>A3S&#39;s APIs are rate limited to ensure fair access for all developers. We expect that most use cases will not genuinely exceed the standard allowed rate, but if your use cases required a higher volume of requests to be serviced then please send your request to listings@stellarport.io.</p>
+
+<p>Requests throttled by the rate limiter will be returned with a 429 Too Many Requests response. Information regarding your rate limiter quote is present on responses through the X-Ratelimit-* headers.</p>
 <h1 id='security'>Security</h1><h1 id='response-signing'>Response Signing</h1>
 <blockquote>
 <p>To verify an arbitrary response from A3S or a Relay Server:</p>
@@ -571,6 +581,10 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <tr>
 <td>asset_code</td>
 <td>The code of the asset being deposited (e.g. BTC).</td>
+</tr>
+<tr>
+<td>account</td>
+<td>The id of the account to fetch transactions for.</td>
 </tr>
 <tr>
 <td>paging_id (optional)</td>
@@ -1057,21 +1071,17 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 <td>The code of the asset being deposited (e.g. BTC)</td>
 </tr>
 </tbody></table>
-<h1 id='withdrawal-2'>Withdrawal</h1><h2 id='withdrawal-instructions'>Withdrawal Instructions</h2>
+<h1 id='withdrawal-2'>Withdrawal</h1><h2 id='withdrawal-destination'>Withdrawal Destination</h2>
 <blockquote>
 <p>Returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="err">//seconds</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Some details about your upcoming withdrawal"</span><span class="w">
+  </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unique_destination_reference"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>Returns withdrawal instructions for a withdrawal destination. Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, incomplete or missing with a <code>message</code> field as to what is incorrect.</p>
+<p>Returns a withdrawal reference for a withdrawal destination. Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, incomplete or missing with a <code>message</code> field as to what is incorrect.</p>
 <h3 id='http-request-13'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Withdraw/Instructions</code></p>
+<p><code>GET https://your.relay.server/Withdraw/Destination</code></p>
 <h3 id='query-parameters-11'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -1092,6 +1102,37 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 <td>Other variable parameters as specified in <a href="#get-info">info</a></td>
 </tr>
 </tbody></table>
+<h2 id='withdrawal-instructions'>Withdrawal Instructions</h2>
+<blockquote>
+<p>Returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_fixed"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fee_percent"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"eta"</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="err">//seconds</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Some details about your upcoming withdrawal"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Returns withdrawal instructions for a withdrawal destination references as generated by <a href="#withdrawal-destination">withdrawal destination</a>.</p>
+<h3 id='http-request-14'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/Withdraw/Instructions</code></p>
+<h3 id='query-parameters-12'>Query Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>asset_code</td>
+<td>The code of the asset being deposited (e.g. BTC)</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>The deposit destination string generated by <a href="#deposit-destination">deposit destination</a>.</td>
+</tr>
+</tbody></table>
 <h2 id='get-withdrawal'>Get Withdrawal</h2>
 <blockquote>
 <p>Returns JSON structured like this:</p>
@@ -1109,7 +1150,7 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a withdrawal.</p>
-<h3 id='http-request-14'>HTTP Request</h3>
+<h3 id='http-request-15'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Withdrawal</code></p>
 <h3 id='url-parameters-9'>URL Parameters</h3>
 <table><thead>
@@ -1138,7 +1179,7 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Sends a withdrawal.</p>
-<h3 id='http-request-15'>HTTP Request</h3>
+<h3 id='http-request-16'>HTTP Request</h3>
 <p><code>GET https://your.relay.server/Withdraw/Send</code></p>
 <h3 id='url-parameters-10'>URL Parameters</h3>
 <table><thead>
