@@ -133,7 +133,7 @@ const a3s = new A3S();
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-let info = await a3s.useSandbox();
+a3s.useSandbox();
 ```
 
 > When you a ready for production:
@@ -141,7 +141,7 @@ let info = await a3s.useSandbox();
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-let info = await a3s.useProd();
+a3s.useProd();
 ```
 
 The A3S sandbox environment is available at `a3s-sandbox.api.stellarport.io`.
