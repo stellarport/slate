@@ -117,7 +117,6 @@ A3S implements idempotency. Essentially, the timing of requests should not affec
 The A3S API is a superset of [SEP0006](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md). You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.
 
 # Getting Started
-If you are using javascript, download the `a3s` package from npm and import it into your project.
 
 ```javascript
 npm install a3s
@@ -147,6 +146,15 @@ a3s.useProd();
 The A3S sandbox environment is available at `a3s-sandbox.api.stellarport.io`.
 
 The A3S production environment is available at `a3s.api.stellarport.io`.
+
+Before getting started developing agains A3S, you might want to play around with A3S to get used to how it works. To enable you to do that, we have deployed a Testnet Ripple asset for you to play with. To access this asset, you can make calls to the A3S sandbox server while replacing all the `asset_issuer` parameters in the A3S endpoints with `GC6OWX3B4NSVUNKHHR6NDCBTFF7IPF6PPVCHXCD5TDTFWSB3LKB7QY55` and `asset_code` with `TXRP`.
+
+You can get yourself some Testnet Ripple at the [testnet ripple faucet](https://developers.ripple.com/xrp-test-net-faucet.html) and manage your testnet wallet from [this handy ripple wallet](https://ripplerm.github.io/ripple-wallet/) (just make sure you select the testnet network).
+
+Tokens will be sent to and from the Stellar mainnet (the A3S sandbox uses the Stellar mainnet due to the cheap transaction fees). You can use the [stellarport client](https://stellarport.io) to manage your mainnet stellar wallet.
+
+Once you are ready to start developing against A3S, if you are using javascript, download the `a3s` package from npm and import it into your project.
+
 
 # Info
 
@@ -507,7 +515,7 @@ curl "https://a3s.api.stellarport.io/v2/GBZNK6EFN3F5ZUS7BV53E2FZLYVYNNJXPR3DSZNO
 const options = {
   dest_extra: 'other_param'
 };
-let instructions = await a3s.depositInstructions(asset_code, asset_issuer, dest, options);
+let instructions = await a3s.withdrawalInstructions(asset_code, asset_issuer, dest, options);
 ```
 
 > The above command returns JSON structured like this:
