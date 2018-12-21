@@ -3,7 +3,6 @@ title: Stellarport A3S Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - javascript
-  - shell
 
 toc_footers:
   - <a href='https://stellarport.io'>A Service By Stellarport</a>
@@ -19,7 +18,7 @@ search: true
 
 Welcome to the Stellarport Anchor As A Service (A3S). You can use our service to connect arbitrary assets to the Stellar network.
 
-We have language bindings in Shell and JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+We have language bindings in JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
 # How It Works
 
@@ -62,37 +61,80 @@ Requests throttled by the rate limiter will be returned with a 429 Too Many Requ
 
 # Security
 
-# Response Signing
+# Authentication
 
-> To verify an arbitrary response from A3S or a Relay Server:
-
-```shell
-# With shell, you will have to write a script to do this.
-```
+> Authentication via the SDK requires a little initial configuration:
 
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-
-let verified = a3s.verifyPayload(signature, payload, pubKey);
+a3s.useProd();
+a3s.configure({
+  requestSigningSecretKey: 'XXX'
+});
 ```
 
-> To produce a signature using an arbitrary payload:
-
-```shell
-# With shell, you will have to write a script to do this.
-```
+> Then, the SDK can be used to produce an arbitrary signature:
 
 ```javascript
-const {RequestSigner} = require('a3s');
-const requrestSigner = new RequestSigner('SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R');
-
-let response = a3s.sign(payload, response);
+let signature = await a3s.connectionManager.signUriAndQuery(uri, query);
 ```
 
-> `response` is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.
+> Or fetch data using this authentication automatically under the hood:
 
-A3S uses a signature scheme for verifying responses between A3S and its relay servers. Every response returned from any server should include a header like so:
+```javascript
+let transaction = await a3s.transaction(assetIssuer, {id: 123});
+```
+
+A3S's endpoints are authenticated for two client types:
+
+1. Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a `Signature` header. A3S will check to see that the `Signature` header matches a corresponding url signed by the relay server's account signing key.
+2. Users - users access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the [token endpoint](#get-token).
+
+<aside class="success">
+In practice, if you are developing a relay server, if you use the A3S sdk, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.
+</aside>
+
+# Response Signing
+
+> Response signing via the SDK requires a little initial configuration:
+
+```javascript
+const {A3S} = require('a3s');
+const a3s = new A3S();
+a3s.useProd();
+a3s.configure({
+  requestSigningSecretKey: 'XXX'
+});
+```
+
+> Then, the SDK can be used to produce a signature for an arbitrary nonce and payload:
+
+```javascript
+const signature = a3s.connectionManager.signPayload(nonce, payload);
+```
+
+> or use the SDK convenience method for a express request, response and payload:
+
+```javascript
+a3s.connectionManager.signResponsePayload(req, res, payload);
+
+return res.json(payload);
+```
+
+> The `signResponsePayload` convenience method expects express style request and response objects as well as a nonce parameter on the request's query object. `signResponsePayload` will automatically add the `Signature` header to the response object.
+
+> To verify an arbitrary response from A3S or a Relay Server:
+
+```javascript
+const {verifyPayloadSignature} = require('a3s');
+
+let verified = verifyPayloadSignature(signature, payload, pubKey, nonce);
+```
+
+It is important for A3S to be able to trust responses it receives from its relay servers just as it is important for relay servers and other clients to be able to trust A3S's respones.
+
+A3S uses a signature scheme for verifying responses between A3S and its relay servers. Any request to A3S or a relay server that includes a query parameter `nonce` should, in the response, include a signature of the nonce+payload by the server's signing key as a response header:
 
 `Signature: xxxx`
 
@@ -114,7 +156,7 @@ A3S implements idempotency. Essentially, the timing of requests should not affec
 
 # A3S API
 
-The A3S API is a superset of [SEP0006](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md). You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.
+The A3S API is a superset of [SEP0006](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md) and [SEP0010](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md). You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.
 
 # Getting Started
 
@@ -123,6 +165,9 @@ npm install a3s
 
 const {A3S} = require('a3s');
 const a3s = new A3S();
+a3s.configure({
+    requestSigningSecretKey: 'XXX'
+})
 ```
 
 # Sandbox Environment
@@ -130,16 +175,12 @@ const a3s = new A3S();
 > To use the sandbox with the a3s sdk:
 
 ```javascript
-const {A3S} = require('a3s');
-const a3s = new A3S();
 a3s.useSandbox();
 ```
 
 > When you a ready for production:
 
 ```javascript
-const {A3S} = require('a3s');
-const a3s = new A3S();
 a3s.useProd();
 ```
 
@@ -155,14 +196,63 @@ Tokens will be sent to and from the Stellar mainnet (the A3S sandbox uses the St
 
 Once you are ready to start developing against A3S, if you are using javascript, download the `a3s` package from npm and import it into your project.
 
+# Tokens
+
+## Get Challenge
+
+> The challenge endpoint returns JSON structured like this:
+
+```json
+{
+  "transaction": "AAAAALpcvtO6Gn93TcEt31GeLnNTjWskb7UpfevrAOh9BoZuAAAAZAAAAAAAAAABAAAAAQAAAABcHUYdAAAAAFwdR0kAAAAAAAAAAQAAAAEAAAAALrNzn3P7uWnnpjjLYhuMSaYtGs6s1Hr6RAQEwZUV2QoAAAAKAAAAGFN0ZWxsYXJwb3J0IFNhbmRib3ggYXV0aAAAAAEAAABADhmP4ne4uz72MGawF/ESFtbe5AggPu0FSKrGr4RcVLhWBYsa0gR5iypJ2/qgBTjJbTAk+TJNBM/TbhAr4Rf8EAAAAAAAAAABfQaGbgAAAEA6k8cPIDR9j0ELyQIlYYzVuxUYtb3TZA8vtoTMVJc4ApzS7CkcdubIad7ihc/d4a3hCVt0bIv9LAg4kqIv/GYC"
+}
+```
+
+Returns a challenge transaction that must be signed and submitted to the [token endpoint](#get-token). This endpoint is for users who would like to access their data via A3S, not needed for relay servers.
+
+### HTTP Request
+
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/authentication`
+
+### Authorization
+
+* This endpoint is open to everyone.
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+account | The public key of the user account on Stellar.
+
+## Get Token
+
+> The token endpoint returns JSON structured like this:
+
+```json
+{
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhM3Mtc2FuZGJveC5hcGkuc3RlbGxhcnBvcnQuaW8iLCJzdWIiOiJHQVhMRzQ0N09QNTNTMlBIVVk0TVdZUTNSUkUyTUxJMloyV05JNlgySVFDQUpRTVZDWE1RVkxHTSIsImlhdCI6MTU0NTQyMjg2OCwiZXhwIjoxNTQ1NDI2NDY4LCJqdGkiOiJ0Z0tnY012QjJOeG1JUTNjcjhGaW51b0x6Q0hMWnd1LytsZWE0NHpOSS9VPSJ9.mu61GYfZqjOskPyeO96XNHaBwwIeAMFJRXxSFNhfY8nYEi9pz5bS6aHif172siH5UvZWk4MJeG6hUIKzKPf4VR6UxRmQojK8TTMmt1BkNE-O_EsZbXwDp_mqScIZNNDkjH0IGdED-Vg1OVXHNlNLjnj_qcWyXjeEjV5zx7pLdZohrwUkn8w7eB1zvgSfGE4V8woOMceLXhuv7we62D7VcoaGqFIaU487m9gDyoC8JhWU7-hZEtLhbzDBGE0GemPKTyv7uFi6helGYU6txoSjJk5-46Ob7pjtpl-NV9fsh9J42iUwQ_xoJiHOqZXwEcuPi_ejTIi_FMhU5G078EqSd-XGOeqr4uwLqJnaqvziQe9dw90OpUiYTrWYOxflzEbRoDBb1HYAnUab70B6ogEDEXRrP9HjvHxssrVycNNFfTK2wH0jip9NhWT5qx1EuDqXWfR6KOrfpRs41ZScaUPR_TwNN4FLf5cb-9VwL5OZBIqF8tvKcSuQezhr5Gk2_dnAgC9dUX2-_p7XusYc-XtiQjuHWx9upc5GyCZHGn9vs1hzn-4iaqGyP8XGf709zwLx-t6jY3KBc_tRCTP2oW_swESt2_Gs8nuFCfM1hJVVPDdvSCC5jnpaQQl1x5LuuV12TVfoQmOUFNxA2BVVsy8xT7iPbKj_fzhn8RvT92-4SJs"
+}
+```
+
+Returns a JSON web token that can be submitted as authentication to other endpoins in A3S and relay servers (for KYC upload).
+
+### HTTP Request
+
+`POST https://a3s.api.stellarport.io/v2/<asset_issuer>/authentication`
+
+### Authorization
+
+* This endpoint is open to everyone.
+
+### Body Parameters
+
+Parameter | Description
+--------- | -----------
+transaction | The signed transaction obtained from the [challenge endpoint](#challenge-endpoint).
 
 # Info
 
 ## Get Info
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Info"
-```
 
 ```javascript
 const {A3S} = require('a3s');
@@ -217,7 +307,11 @@ Retrieves basic info relating to the assets available via A3S for a specific iss
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Info`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/info`
+
+### Authorization
+
+* This endpoint is open to everyone.
 
 ### URL Parameters
 
@@ -228,10 +322,6 @@ asset_issuer | The public key of the issuing account on Stellar.
 # Transactions
 
 ## Get Transactions
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transactions?asset_code=XRP&account=GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I"
-```
 
 ```javascript
 const options = {
@@ -272,7 +362,12 @@ Returns a list of transactions.
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Transactions`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/transactions`
+
+### Authorization
+
+* Open to relay servers for transactions in their issued assets.
+* Open to users for transactions involving their accounts.
 
 ### URL Parameters
 
@@ -291,10 +386,6 @@ no_older_than (optional) | Only return transactions newer than.
 limit (optional) | Number of transactions to return.
 
 ## Get One Transaction
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transaction?id=32"
-```
 
 ```javascript
 const options = {
@@ -330,7 +421,12 @@ Returns a specific transaction.
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Transaction`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/transaction`
+
+### Authorization
+
+* Open to relay servers for transactions in their issued assets.
+* Open to users for transactions involving their accounts.
 
 ### URL Parameters
 
@@ -349,10 +445,6 @@ external_transaction_id | The external transaction id
 # Deposit
 
 ## Get Deposit Instructions
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit?asset_code=BTC&account=GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM&memo_type=text&memo=memostring"
-```
 
 ```javascript
 let instructions = await a3s.depositInstructions(asset_code, asset_issuer, account, options);
@@ -378,7 +470,12 @@ Retrieves instructions on how to complete a deposit for a specific asset to a sp
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Deposit`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/deposit`
+
+### Authorization
+
+* Open to relay servers for instructions in their issued assets.
+* Open to users for instructions for their account.
 
 ### URL Parameters
 
@@ -396,10 +493,6 @@ memo (optional) | Memo to attach to the crediting transaction.
 memo_type (optional) | Required if memo is specified.
 
 ## Notify Deposit Received
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&reference=relayserverreference"
-```
 
 ```javascript
 let depositTransaction = await depositSent(reference, asset_code, asset_issuer);
@@ -433,7 +526,11 @@ If a deposit is not yet confirmed, A3S will store it as pending and will wait on
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Deposit/Sent`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/deposit/sent`
+
+### Authorization
+
+* Open to relay servers for deposits in their issued assets.
 
 ### URL Parameters
 
@@ -449,10 +546,6 @@ asset_code | The code of the asset being deposited (e.g. BTC)
 reference | Unique relay server reference
 
 ## Notify Deposit Confirmed
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&reference=44"
-```
 
 ```javascript
 let depositTransaction = await depositConfirmed(reference, asset_code, asset_issuer);
@@ -488,7 +581,11 @@ In cases where a relay server has a new deposit (that A3S does not yet know abou
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Deposit/Confirmed`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/deposit/confirmed`
+
+### Authorization
+
+* Open to relay servers for deposits in their issued assets.
 
 ### URL Parameters
 
@@ -506,10 +603,6 @@ reference | Unique relay server reference
 # Withdrawal
 
 ## Get Withdrawal Instructions
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBZNK6EFN3F5ZUS7BV53E2FZLYVYNNJXPR3DSZNOUD6C5W6N2QXV3PFN/Withdraw?asset_code=XRP&dest=rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf&dest_extra=55"
-```
 
 ```javascript
 const options = {
@@ -537,7 +630,12 @@ Returns a set of instructions for the execution of a withdrawal.
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Withdraw`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/withdraw`
+
+### Authorization
+
+* Open to relay servers for instructions in their issued assets.
+* Open to users for instructions for their account.
 
 ### URL Parameters
 
@@ -554,10 +652,6 @@ dest  | The desired withdrawal destination
 dest_extra (optional) | Another parameter to identify the withdrawal destination as required by [info](#get-info)
 
 ## Notify Withdrawal Sent
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&op_order=1"
-```
 
 ```javascript
 let depositTransaction = await withdrawalSent(tx_hash, op_order);
@@ -588,7 +682,11 @@ Notifies A3S of an incoming withdrawal. This endpoint does not usually need to b
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/Withdraw/Sent`
+`GET https://a3s.api.stellarport.io/v2/withdraw/sent`
+
+### Authorization
+
+* This endpoint is not open to the public currently (we may open it up in the future).
 
 ### Query Parameters
 
@@ -598,10 +696,6 @@ tx_hash | The Stellar transaction hash of the withdrawal.
 op_order | The operation order of the payment transaction.
 
 ## Notify Withdrawal Confirmed
-
-```shell
-curl "https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&reference=44"
-```
 
 ```javascript
 let depositTransaction = await withdrawalConfirmed(reference, asset_code, asset_issuer);
@@ -637,7 +731,11 @@ Once the withdrwaal successfully completes, the relay server should use this end
 
 ### HTTP Request
 
-`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/Withdraw/Confirmed`
+`GET https://a3s.api.stellarport.io/v2/<asset_issuer>/withdraw/confirmed`
+
+### Authorization
+
+* Open to relay servers for withdrawals in their issued assets.
 
 ### URL Parameters
 
@@ -659,11 +757,87 @@ If you are simply trying to interact with A3S and not actually run a relay serve
 
 To get started building a relay server, you can check out our [relay-server-skeleton](https://github.com/stellarport/relay-server-skeleton)
 
+#Authentication
+
+> Verify an A3S request like this:
+
+```javascript
+require {A3S} from 'a3s'
+const a3s = new A3S();
+a3s.useProd();
+
+verificationResult = await a3s.connectionManager.verifyRequestByUriAndQuerySignature(req);
+
+if (!verificationResult || !verificationResult.verified) {
+    // Return 401 not authorized response.
+}
+```
+
+> Verify a JSON web token like this:
+
+```javascript
+require {A3S} from 'a3s'
+const a3s = new A3S();
+a3s.useProd();
+
+verificationResult = await a3s.connectionManager.verifyRequestByJWT(req);
+
+if (!verificationResult || !verificationResult.verified) {
+    // Return 401 not authorized response.
+}
+```
+
+A relay server should restrict its endpoints from public consumption. Most endpoints should only be accessible by A3S. Only the KYC endpoints should be accessible by the public in an authenticated fashion. KYC should only be allowed to requests including a JSON web token produced by A3S belonging to the correct account. 
+
+# KYC
+
+A replay server can choose to add KYC requirements. In order to authenticate user requests for KYC upload, the relay server should verify the JSON web token on the request using the A3S SDK.
+
+## Upload KYC
+
+Allows users to upload KYC information.
+
+### HTTP Request
+
+`PUT https://your.relay.server/customer`
+
+### Body Parameters
+
+Parameter | Description
+--------- | -----------
+account | The stellar account to add the KYC information for
+memo_type | The stellar memo type to add the KYC information for
+memo | The stellar memo to add the KYC information for
+params | Additional params from the [sep9 superset](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md) as required by the relay server.
+
+## Delete KYC
+
+Allows users to delete KYC information.
+
+### HTTP Request
+
+`DELETE https://your.relay.server/customer/<account>`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+account | The stellar account to delete the KYC information for
+
 # Deposit
 
 ## Deposit Destination
 
-> Returns JSON structured like this:
+> If KYC is required, returns JSON structured like this:
+
+```json
+{
+  "type": "non_interactive_customer_info_needed",
+  "fields" : ["family_name", "given_name", "address"]
+}
+```
+
+> On success, returns JSON structured like this:
 
 ```json
 {
@@ -673,13 +847,24 @@ To get started building a relay server, you can check out our [relay-server-skel
 
 Generates a new unique deposit destination and returns the reference. The reference should be a string that a user will recognize as identifying a particular destination.
 
+If KYC is required, should return the fields that are required from the [sep9 superset](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md)
+
 ### HTTP Request
 
-`GET https://your.relay.server/Deposit/Destination`
+`GET https://your.relay.server/deposit/destination`
 
 ## Deposit Instructions
 
-> Returns JSON structured like this:
+> If KYC is required, returns JSON structured like this:
+
+```json
+{
+  "type": "non_interactive_customer_info_needed",
+  "fields" : ["family_name", "given_name", "address"]
+}
+```
+
+> On success, returns JSON structured like this:
 
 ```json
 {
@@ -694,9 +879,11 @@ Generates a new unique deposit destination and returns the reference. The refere
 
 Returns a set of corresponding instructions for a specific deposit destination.
 
+If KYC is required, should return the fields that are required from the [sep9 superset](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md)
+
 ### HTTP Request
 
-`GET https://your.relay.server/Deposit/Instructions`
+`GET https://your.relay.server/deposit/instructions`
 
 ### Query Parameters
 
@@ -729,7 +916,7 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 
 ### HTTP Request
 
-`GET https://your.relay.server/Deposit`
+`GET https://your.relay.server/deposit`
 
 ### Query Parameters
 
@@ -741,7 +928,17 @@ asset_code | The code of the asset being deposited (e.g. BTC)
 
 ## Withdrawal Destination
 
-> Returns JSON structured like this:
+
+> If KYC is required, returns JSON structured like this:
+
+```json
+{
+  "type": "non_interactive_customer_info_needed",
+  "fields" : ["family_name", "given_name", "address"]
+}
+```
+
+> On success, returns JSON structured like this:
 
 ```json
 {
@@ -751,9 +948,11 @@ asset_code | The code of the asset being deposited (e.g. BTC)
 
 Returns a withdrawal reference for a withdrawal destination. Should return a `200` status code if the destination is valid, otherwise a `400` status code if the destination parameters are invalid, incomplete or missing with a `message` field as to what is incorrect.
 
+If KYC is required, should return the fields that are required from the [sep9 superset](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md)
+
 ### HTTP Request
 
-`GET https://your.relay.server/Withdraw/Destination`
+`GET https://your.relay.server/withdraw/destination`
 
 ### Query Parameters
 
@@ -765,7 +964,16 @@ other parameters | Other variable parameters as specified in [info](#get-info)
 
 ## Withdrawal Instructions
 
-> Returns JSON structured like this:
+> If KYC is required, returns JSON structured like this:
+
+```json
+{
+  "type": "non_interactive_customer_info_needed",
+  "fields" : ["family_name", "given_name", "address"]
+}
+```
+
+> On success, returns JSON structured like this:
 
 ```json
 {
@@ -779,9 +987,11 @@ other parameters | Other variable parameters as specified in [info](#get-info)
 
 Returns withdrawal instructions for a withdrawal destination references as generated by [withdrawal destination](#withdrawal-destination).
 
+If KYC is required, should return the fields that are required from the [sep9 superset](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md)
+
 ### HTTP Request
 
-`GET https://your.relay.server/Withdraw/Instructions`
+`GET https://your.relay.server/withdraw/instructions`
 
 ### Query Parameters
 
@@ -812,7 +1022,7 @@ Returns a withdrawal.
 
 ### HTTP Request
 
-`GET https://your.relay.server/Withdrawal`
+`GET https://your.relay.server/withdrawal`
 
 ### URL Parameters
 
@@ -840,7 +1050,7 @@ Sends a withdrawal.
 
 ### HTTP Request
 
-`GET https://your.relay.server/Withdraw/Send`
+`GET https://your.relay.server/withdraw/send`
 
 ### URL Parameters
 

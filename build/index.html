@@ -203,7 +203,7 @@
       <script src="javascripts/all.js"></script>
   </head>
 
-  <body class="index" data-languages="[&quot;javascript&quot;,&quot;shell&quot;]">
+  <body class="index" data-languages="[&quot;javascript&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
@@ -214,7 +214,6 @@
       <img src="images/logo.png" class="logo" alt="Logo" />
         <div class="lang-selector">
               <a href="#" data-language-name="javascript">javascript</a>
-              <a href="#" data-language-name="shell">shell</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -234,6 +233,9 @@
             <a href="#security" class="toc-h1 toc-link" data-title="Security">Security</a>
           </li>
           <li>
+            <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
+          </li>
+          <li>
             <a href="#response-signing" class="toc-h1 toc-link" data-title="Response Signing">Response Signing</a>
           </li>
           <li>
@@ -250,6 +252,17 @@
           </li>
           <li>
             <a href="#sandbox-environment" class="toc-h1 toc-link" data-title="Sandbox Environment">Sandbox Environment</a>
+          </li>
+          <li>
+            <a href="#tokens" class="toc-h1 toc-link" data-title="Tokens">Tokens</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-challenge" class="toc-h2 toc-link" data-title="Get Challenge">Get Challenge</a>
+                  </li>
+                  <li>
+                    <a href="#get-token" class="toc-h2 toc-link" data-title="Get Token">Get Token</a>
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#info" class="toc-h1 toc-link" data-title="Info">Info</a>
@@ -305,6 +318,20 @@
             <a href="#getting-started-2" class="toc-h1 toc-link" data-title="Getting Started">Getting Started</a>
           </li>
           <li>
+            <a href="#authentication-2" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
+          </li>
+          <li>
+            <a href="#kyc" class="toc-h1 toc-link" data-title="KYC">KYC</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#upload-kyc" class="toc-h2 toc-link" data-title="Upload KYC">Upload KYC</a>
+                  </li>
+                  <li>
+                    <a href="#delete-kyc" class="toc-h2 toc-link" data-title="Delete KYC">Delete KYC</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#deposit-2" class="toc-h1 toc-link" data-title="Deposit">Deposit</a>
               <ul class="toc-list-h2">
                   <li>
@@ -350,7 +377,7 @@
         <h1 id='introduction'>Introduction</h1>
 <p>Welcome to the Stellarport Anchor As A Service (A3S). You can use our service to connect arbitrary assets to the Stellar network.</p>
 
-<p>We have language bindings in Shell and JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<p>We have language bindings in JavaScript. You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
 <h1 id='how-it-works'>How It Works</h1>
 <p>A3S is a central hub that connects arbitrary assets to the Stellar network. Its job is to faithfully execute deposits and withdrawals for an arbitrary asset. To do this it communicates with a set of Relay Servers. Each asset that A3S manages is associated with a Relay Server that runs the logic specific to that asset. A3S, and a Relay Server, are the connection between the Stellar network and an asset. The responsibilities are split like so:</p>
 
@@ -395,30 +422,72 @@ This is a simple case, describing a 1-to-1 issuance. A3S features certain flexib
 <p>A3S&#39;s APIs are rate limited to ensure fair access for all developers. We expect that most use cases will not genuinely exceed the standard allowed rate, but if your use cases required a higher volume of requests to be serviced then please send your request to listings@stellarport.io.</p>
 
 <p>Requests throttled by the rate limiter will be returned with a 429 Too Many Requests response. Information regarding your rate limiter quote is present on responses through the X-Ratelimit-* headers.</p>
-<h1 id='security'>Security</h1><h1 id='response-signing'>Response Signing</h1>
+<h1 id='security'>Security</h1><h1 id='authentication'>Authentication</h1>
 <blockquote>
+<p>Authentication via the SDK requires a little initial configuration:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+  <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Then, the SDK can be used to produce an arbitrary signature:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">signUriAndQuery</span><span class="p">(</span><span class="nx">uri</span><span class="p">,</span> <span class="nx">query</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Or fetch data using this authentication automatically under the hood:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">,</span> <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">});</span>
+</code></pre>
+<p>A3S&#39;s endpoints are authenticated for two client types:</p>
+
+<ol>
+<li>Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a <code>Signature</code> header. A3S will check to see that the <code>Signature</code> header matches a corresponding url signed by the relay server&#39;s account signing key.</li>
+<li>Users - users access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the <a href="#get-token">token endpoint</a>.</li>
+</ol>
+
+<aside class="success">
+In practice, if you are developing a relay server, if you use the A3S sdk, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.
+</aside>
+<h1 id='response-signing'>Response Signing</h1>
+<blockquote>
+<p>Response signing via the SDK requires a little initial configuration:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+  <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Then, the SDK can be used to produce a signature for an arbitrary nonce and payload:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">signPayload</span><span class="p">(</span><span class="nx">nonce</span><span class="p">,</span> <span class="nx">payload</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>or use the SDK convenience method for a express request, response and payload:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">signResponsePayload</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">payload</span><span class="p">);</span>
+
+<span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">(</span><span class="nx">payload</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The <code>signResponsePayload</code> convenience method expects express style request and response objects as well as a nonce parameter on the request&#39;s query object. <code>signResponsePayload</code> will automatically add the <code>Signature</code> header to the response object.</p>
+
 <p>To verify an arbitrary response from A3S or a Relay Server:</p>
 </blockquote>
-<pre class="highlight shell tab-shell"><code><span class="c"># With shell, you will have to write a script to do this.</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">verifyPayloadSignature</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 
-<span class="kd">let</span> <span class="nx">verified</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">verifyPayload</span><span class="p">(</span><span class="nx">signature</span><span class="p">,</span> <span class="nx">payload</span><span class="p">,</span> <span class="nx">pubKey</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">verified</span> <span class="o">=</span> <span class="nx">verifyPayloadSignature</span><span class="p">(</span><span class="nx">signature</span><span class="p">,</span> <span class="nx">payload</span><span class="p">,</span> <span class="nx">pubKey</span><span class="p">,</span> <span class="nx">nonce</span><span class="p">);</span>
 </code></pre>
-<blockquote>
-<p>To produce a signature using an arbitrary payload:</p>
-</blockquote>
-<pre class="highlight shell tab-shell"><code><span class="c"># With shell, you will have to write a script to do this.</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">RequestSigner</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">requrestSigner</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RequestSigner</span><span class="p">(</span><span class="s1">'SC3WN7VGIAVBAX4XTBJCNHWU74Z4OAWNSEJPWSTDT5IANPZXH2BBUW6R'</span><span class="p">);</span>
+<p>It is important for A3S to be able to trust responses it receives from its relay servers just as it is important for relay servers and other clients to be able to trust A3S&#39;s respones.</p>
 
-<span class="kd">let</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">payload</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
-</code></pre>
-<blockquote>
-<p><code>response</code> is an express Response object. DO NOT use secret key above. Instead replace it with a secret key of your own.</p>
-</blockquote>
-
-<p>A3S uses a signature scheme for verifying responses between A3S and its relay servers. Every response returned from any server should include a header like so:</p>
+<p>A3S uses a signature scheme for verifying responses between A3S and its relay servers. Any request to A3S or a relay server that includes a query parameter <code>nonce</code> should, in the response, include a signature of the nonce+payload by the server&#39;s signing key as a response header:</p>
 
 <p><code>Signature: xxxx</code></p>
 
@@ -436,25 +505,24 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <h1 id='idempotency'>Idempotency</h1>
 <p>A3S implements idempotency. Essentially, the timing of requests should not affect the actions of A3S. Relay servers should also implement idempotency. For example, if an attacker quickly sends two requests to a relay server to execute a withdrawal, only one withdrawal should actually be executed.</p>
 <h1 id='a3s-api'>A3S API</h1>
-<p>The A3S API is a superset of <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md">SEP0006</a>. You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.</p>
+<p>The A3S API is a superset of <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0006.md">SEP0006</a> and <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md">SEP0010</a>. You should find all the endpoints in the SEP available in A3S as well as few additional endpoints.</p>
 <h1 id='getting-started'>Getting Started</h1><pre class="highlight javascript tab-javascript"><code><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">a3s</span>
 
 <span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+    <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
+<span class="p">})</span>
 </code></pre><h1 id='sandbox-environment'>Sandbox Environment</h1>
 <blockquote>
 <p>To use the sandbox with the a3s sdk:</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useSandbox</span><span class="p">();</span>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">a3s</span><span class="p">.</span><span class="nx">useSandbox</span><span class="p">();</span>
 </code></pre>
 <blockquote>
 <p>When you a ready for production:</p>
 </blockquote>
-<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
 </code></pre>
 <p>The A3S sandbox environment is available at <code>a3s-sandbox.api.stellarport.io</code>.</p>
 
@@ -467,8 +535,61 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>Tokens will be sent to and from the Stellar mainnet (the A3S sandbox uses the Stellar mainnet due to the cheap transaction fees). You can use the <a href="https://stellarport.io">stellarport client</a> to manage your mainnet stellar wallet.</p>
 
 <p>Once you are ready to start developing against A3S, if you are using javascript, download the <code>a3s</code> package from npm and import it into your project.</p>
-<h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Info"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<h1 id='tokens'>Tokens</h1><h2 id='get-challenge'>Get Challenge</h2>
+<blockquote>
+<p>The challenge endpoint returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"transaction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AAAAALpcvtO6Gn93TcEt31GeLnNTjWskb7UpfevrAOh9BoZuAAAAZAAAAAAAAAABAAAAAQAAAABcHUYdAAAAAFwdR0kAAAAAAAAAAQAAAAEAAAAALrNzn3P7uWnnpjjLYhuMSaYtGs6s1Hr6RAQEwZUV2QoAAAAKAAAAGFN0ZWxsYXJwb3J0IFNhbmRib3ggYXV0aAAAAAEAAABADhmP4ne4uz72MGawF/ESFtbe5AggPu0FSKrGr4RcVLhWBYsa0gR5iypJ2/qgBTjJbTAk+TJNBM/TbhAr4Rf8EAAAAAAAAAABfQaGbgAAAEA6k8cPIDR9j0ELyQIlYYzVuxUYtb3TZA8vtoTMVJc4ApzS7CkcdubIad7ihc/d4a3hCVt0bIv9LAg4kqIv/GYC"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Returns a challenge transaction that must be signed and submitted to the <a href="#get-token">token endpoint</a>. This endpoint is for users who would like to access their data via A3S, not needed for relay servers.</p>
+<h3 id='http-request'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/authentication</code></p>
+<h3 id='authorization'>Authorization</h3>
+<ul>
+<li>This endpoint is open to everyone.</li>
+</ul>
+<h3 id='url-parameters'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>account</td>
+<td>The public key of the user account on Stellar.</td>
+</tr>
+</tbody></table>
+<h2 id='get-token'>Get Token</h2>
+<blockquote>
+<p>The token endpoint returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhM3Mtc2FuZGJveC5hcGkuc3RlbGxhcnBvcnQuaW8iLCJzdWIiOiJHQVhMRzQ0N09QNTNTMlBIVVk0TVdZUTNSUkUyTUxJMloyV05JNlgySVFDQUpRTVZDWE1RVkxHTSIsImlhdCI6MTU0NTQyMjg2OCwiZXhwIjoxNTQ1NDI2NDY4LCJqdGkiOiJ0Z0tnY012QjJOeG1JUTNjcjhGaW51b0x6Q0hMWnd1LytsZWE0NHpOSS9VPSJ9.mu61GYfZqjOskPyeO96XNHaBwwIeAMFJRXxSFNhfY8nYEi9pz5bS6aHif172siH5UvZWk4MJeG6hUIKzKPf4VR6UxRmQojK8TTMmt1BkNE-O_EsZbXwDp_mqScIZNNDkjH0IGdED-Vg1OVXHNlNLjnj_qcWyXjeEjV5zx7pLdZohrwUkn8w7eB1zvgSfGE4V8woOMceLXhuv7we62D7VcoaGqFIaU487m9gDyoC8JhWU7-hZEtLhbzDBGE0GemPKTyv7uFi6helGYU6txoSjJk5-46Ob7pjtpl-NV9fsh9J42iUwQ_xoJiHOqZXwEcuPi_ejTIi_FMhU5G078EqSd-XGOeqr4uwLqJnaqvziQe9dw90OpUiYTrWYOxflzEbRoDBb1HYAnUab70B6ogEDEXRrP9HjvHxssrVycNNFfTK2wH0jip9NhWT5qx1EuDqXWfR6KOrfpRs41ZScaUPR_TwNN4FLf5cb-9VwL5OZBIqF8tvKcSuQezhr5Gk2_dnAgC9dUX2-_p7XusYc-XtiQjuHWx9upc5GyCZHGn9vs1hzn-4iaqGyP8XGf709zwLx-t6jY3KBc_tRCTP2oW_swESt2_Gs8nuFCfM1hJVVPDdvSCC5jnpaQQl1x5LuuV12TVfoQmOUFNxA2BVVsy8xT7iPbKj_fzhn8RvT92-4SJs"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Returns a JSON web token that can be submitted as authentication to other endpoins in A3S and relay servers (for KYC upload).</p>
+<h3 id='http-request-2'>HTTP Request</h3>
+<p><code>POST https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/authentication</code></p>
+<h3 id='authorization-2'>Authorization</h3>
+<ul>
+<li>This endpoint is open to everyone.</li>
+</ul>
+<h3 id='body-parameters'>Body Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>transaction</td>
+<td>The signed transaction obtained from the <a href="#challenge-endpoint">challenge endpoint</a>.</td>
+</tr>
+</tbody></table>
+<h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
 <span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">);</span>
 </code></pre>
@@ -515,9 +636,13 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Retrieves basic info relating to the assets available via A3S for a specific issuing account.</p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Info</code></p>
-<h3 id='url-parameters'>URL Parameters</h3>
+<h3 id='http-request-3'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/info</code></p>
+<h3 id='authorization-3'>Authorization</h3>
+<ul>
+<li>This endpoint is open to everyone.</li>
+</ul>
+<h3 id='url-parameters-2'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -529,8 +654,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>The public key of the issuing account on Stellar.</td>
 </tr>
 </tbody></table>
-<h1 id='transactions'>Transactions</h1><h2 id='get-transactions'>Get Transactions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transactions?asset_code=XRP&amp;account=GCAANVYGJHG43WGHCM435FEJJZ3M4CYQ5JIYCNAR5ARIYAS3KRPEPZ4I"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+<h1 id='transactions'>Transactions</h1><h2 id='get-transactions'>Get Transactions</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">paging_id</span><span class="p">:</span> <span class="s2">"234"</span><span class="p">,</span>
   <span class="na">no_older_than</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">'December 17, 1995 03:24:00'</span><span class="p">),</span>
   <span class="na">limit</span><span class="p">:</span> <span class="mi">25</span>
@@ -563,9 +687,14 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a list of transactions.</p>
-<h3 id='http-request-2'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transactions</code></p>
-<h3 id='url-parameters-2'>URL Parameters</h3>
+<h3 id='http-request-4'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/transactions</code></p>
+<h3 id='authorization-4'>Authorization</h3>
+<ul>
+<li>Open to relay servers for transactions in their issued assets.</li>
+<li>Open to users for transactions involving their accounts.</li>
+</ul>
+<h3 id='url-parameters-3'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -605,8 +734,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Number of transactions to return.</td>
 </tr>
 </tbody></table>
-<h2 id='get-one-transaction'>Get One Transaction</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Transaction?id=32"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+<h2 id='get-one-transaction'>Get One Transaction</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">id</span><span class="p">:</span> <span class="mi">32</span>
 <span class="p">}</span>
 <span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
@@ -634,9 +762,14 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a specific transaction.</p>
-<h3 id='http-request-3'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Transaction</code></p>
-<h3 id='url-parameters-3'>URL Parameters</h3>
+<h3 id='http-request-5'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/transaction</code></p>
+<h3 id='authorization-5'>Authorization</h3>
+<ul>
+<li>Open to relay servers for transactions in their issued assets.</li>
+<li>Open to users for transactions involving their accounts.</li>
+</ul>
+<h3 id='url-parameters-4'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -668,8 +801,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>The external transaction id</td>
 </tr>
 </tbody></table>
-<h1 id='deposit'>Deposit</h1><h2 id='get-deposit-instructions'>Get Deposit Instructions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit?asset_code=BTC&amp;account=GCQLYUE2DJT3N57BKHKW5DUOELDSEHNGIVHVHFBS5YMDBZX55RTSR6FM&amp;memo_type=text&amp;memo=memostring"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">depositInstructions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">account</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+<h1 id='deposit'>Deposit</h1><h2 id='get-deposit-instructions'>Get Deposit Instructions</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">depositInstructions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">account</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -687,9 +819,14 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Retrieves instructions on how to complete a deposit for a specific asset to a specific Stellar account.</p>
-<h3 id='http-request-4'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit</code></p>
-<h3 id='url-parameters-4'>URL Parameters</h3>
+<h3 id='http-request-6'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/deposit</code></p>
+<h3 id='authorization-6'>Authorization</h3>
+<ul>
+<li>Open to relay servers for instructions in their issued assets.</li>
+<li>Open to users for instructions for their account.</li>
+</ul>
+<h3 id='url-parameters-5'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -725,8 +862,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Required if memo is specified.</td>
 </tr>
 </tbody></table>
-<h2 id='notify-deposit-received'>Notify Deposit Received</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Sent?asset_code=XRP&amp;reference=relayserverreference"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositSent</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+<h2 id='notify-deposit-received'>Notify Deposit Received</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositSent</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -752,9 +888,13 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>Notifies A3S of an incoming deposit. This is almost always called by the relay server. The deposit does not yet need to be confirmed in order to make this call. It is best for a relay server to make this call as soon as it has spotted in incoming deposit.</p>
 
 <p>If a deposit is not yet confirmed, A3S will store it as pending and will wait on confirmation before issuing any tokens on Stellar.</p>
-<h3 id='http-request-5'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Sent</code></p>
-<h3 id='url-parameters-5'>URL Parameters</h3>
+<h3 id='http-request-7'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/deposit/sent</code></p>
+<h3 id='authorization-7'>Authorization</h3>
+<ul>
+<li>Open to relay servers for deposits in their issued assets.</li>
+</ul>
+<h3 id='url-parameters-6'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -782,8 +922,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Unique relay server reference</td>
 </tr>
 </tbody></table>
-<h2 id='notify-deposit-confirmed'>Notify Deposit Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Deposit/Confirmed?asset_code=XRP&amp;reference=44"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+<h2 id='notify-deposit-confirmed'>Notify Deposit Confirmed</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">depositConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -811,9 +950,13 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>In other words, this endpoint is only for a situation where a relay server has a deposit that it already notified A3S about that has now gone to <code>SUCCESS</code> from <code>PENDING</code>.</p>
 
 <p>In cases where a relay server has a new deposit (that A3S does not yet know about), it can just call <a href="#notify-deposit-sent">Notify Deposit Sent</a> and A3S will issue tokens. In that case, there is no need to use this endpoint at all.</p>
-<h3 id='http-request-6'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Deposit/Confirmed</code></p>
-<h3 id='url-parameters-6'>URL Parameters</h3>
+<h3 id='http-request-8'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/deposit/confirmed</code></p>
+<h3 id='authorization-8'>Authorization</h3>
+<ul>
+<li>Open to relay servers for deposits in their issued assets.</li>
+</ul>
+<h3 id='url-parameters-7'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -841,8 +984,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Unique relay server reference</td>
 </tr>
 </tbody></table>
-<h1 id='withdrawal'>Withdrawal</h1><h2 id='get-withdrawal-instructions'>Get Withdrawal Instructions</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBZNK6EFN3F5ZUS7BV53E2FZLYVYNNJXPR3DSZNOUD6C5W6N2QXV3PFN/Withdraw?asset_code=XRP&amp;dest=rNXEkKCxvfLcM1h4HJkaj2FtmYuAWrHGbf&amp;dest_extra=55"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+<h1 id='withdrawal'>Withdrawal</h1><h2 id='get-withdrawal-instructions'>Get Withdrawal Instructions</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">dest_extra</span><span class="p">:</span> <span class="s1">'other_param'</span>
 <span class="p">};</span>
 <span class="kd">let</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">withdrawalInstructions</span><span class="p">(</span><span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
@@ -862,9 +1004,14 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a set of instructions for the execution of a withdrawal.</p>
-<h3 id='http-request-7'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw</code></p>
-<h3 id='url-parameters-7'>URL Parameters</h3>
+<h3 id='http-request-9'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/withdraw</code></p>
+<h3 id='authorization-9'>Authorization</h3>
+<ul>
+<li>Open to relay servers for instructions in their issued assets.</li>
+<li>Open to users for instructions for their account.</li>
+</ul>
+<h3 id='url-parameters-8'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -896,8 +1043,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>Another parameter to identify the withdrawal destination as required by <a href="#get-info">info</a></td>
 </tr>
 </tbody></table>
-<h2 id='notify-withdrawal-sent'>Notify Withdrawal Sent</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/Withdraw/Sent?tx_hash=2fe974224fd3cb323dfc02cb62dcd7797ca9975ecf3c80b80f1c9a6fe60430b6&amp;op_order=1"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalSent</span><span class="p">(</span><span class="nx">tx_hash</span><span class="p">,</span> <span class="nx">op_order</span><span class="p">);</span>
+<h2 id='notify-withdrawal-sent'>Notify Withdrawal Sent</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalSent</span><span class="p">(</span><span class="nx">tx_hash</span><span class="p">,</span> <span class="nx">op_order</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -920,8 +1066,12 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Notifies A3S of an incoming withdrawal. This endpoint does not usually need to be called by anyone (as A3S autosenses incoming withdrawals).</p>
-<h3 id='http-request-8'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/Withdraw/Sent</code></p>
+<h3 id='http-request-10'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/withdraw/sent</code></p>
+<h3 id='authorization-10'>Authorization</h3>
+<ul>
+<li>This endpoint is not open to the public currently (we may open it up in the future).</li>
+</ul>
 <h3 id='query-parameters-7'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -938,8 +1088,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>The operation order of the payment transaction.</td>
 </tr>
 </tbody></table>
-<h2 id='notify-withdrawal-confirmed'>Notify Withdrawal Confirmed</h2><pre class="highlight shell tab-shell"><code>curl <span class="s2">"https://a3s.api.stellarport.io/v2/GBVOL67TMUQBGL4TZYNMY3ZQ5WGQYFPFD5VJRWXR72VA33VFNL225PL5/Withdraw/Confirmed?asset_code=XRP&amp;reference=44"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
+<h2 id='notify-withdrawal-confirmed'>Notify Withdrawal Confirmed</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">depositTransaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">withdrawalConfirmed</span><span class="p">(</span><span class="nx">reference</span><span class="p">,</span> <span class="nx">asset_code</span><span class="p">,</span> <span class="nx">asset_issuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -967,9 +1116,13 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>Often, after A3S notifies the relay server to execute a withdrawal via <a href="#send-withdrawal">Send Withdrawal</a>, it will get a <code>PENDING</code> response.</p>
 
 <p>Once the withdrwaal successfully completes, the relay server should use this endpoint to notify A3S that a withdrawal is now confirmed.</p>
-<h3 id='http-request-9'>HTTP Request</h3>
-<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/Withdraw/Confirmed</code></p>
-<h3 id='url-parameters-8'>URL Parameters</h3>
+<h3 id='http-request-11'>HTTP Request</h3>
+<p><code>GET https://a3s.api.stellarport.io/v2/&lt;asset_issuer&gt;/withdraw/confirmed</code></p>
+<h3 id='authorization-11'>Authorization</h3>
+<ul>
+<li>Open to relay servers for withdrawals in their issued assets.</li>
+</ul>
+<h3 id='url-parameters-9'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1001,20 +1154,112 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p>If you are simply trying to interact with A3S and not actually run a relay server, you should never have to communicate with a relay server directly. This section is only for integrators who would like to run a relay server and interact with A3S so that they can bridge an asset to Stellar.</p>
 
 <p>To get started building a relay server, you can check out our <a href="https://github.com/stellarport/relay-server-skeleton">relay-server-skeleton</a></p>
+<h1 id='authentication-2'>Authentication</h1>
+<blockquote>
+<p>Verify an A3S request like this:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">require</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'a3s'</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+
+<span class="nx">verificationResult</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">verifyRequestByUriAndQuerySignature</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">verificationResult</span> <span class="o">||</span> <span class="o">!</span><span class="nx">verificationResult</span><span class="p">.</span><span class="nx">verified</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Return 401 not authorized response.</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>Verify a JSON web token like this:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">require</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'a3s'</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+
+<span class="nx">verificationResult</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">verifyRequestByJWT</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">verificationResult</span> <span class="o">||</span> <span class="o">!</span><span class="nx">verificationResult</span><span class="p">.</span><span class="nx">verified</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Return 401 not authorized response.</span>
+<span class="p">}</span>
+</code></pre>
+<p>A relay server should restrict its endpoints from public consumption. Most endpoints should only be accessible by A3S. Only the KYC endpoints should be accessible by the public in an authenticated fashion. KYC should only be allowed to requests including a JSON web token produced by A3S belonging to the correct account. </p>
+<h1 id='kyc'>KYC</h1>
+<p>A replay server can choose to add KYC requirements. In order to authenticate user requests for KYC upload, the relay server should verify the JSON web token on the request using the A3S SDK.</p>
+<h2 id='upload-kyc'>Upload KYC</h2>
+<p>Allows users to upload KYC information.</p>
+<h3 id='http-request-12'>HTTP Request</h3>
+<p><code>PUT https://your.relay.server/customer</code></p>
+<h3 id='body-parameters-2'>Body Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>account</td>
+<td>The stellar account to add the KYC information for</td>
+</tr>
+<tr>
+<td>memo_type</td>
+<td>The stellar memo type to add the KYC information for</td>
+</tr>
+<tr>
+<td>memo</td>
+<td>The stellar memo to add the KYC information for</td>
+</tr>
+<tr>
+<td>params</td>
+<td>Additional params from the <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md">sep9 superset</a> as required by the relay server.</td>
+</tr>
+</tbody></table>
+<h2 id='delete-kyc'>Delete KYC</h2>
+<p>Allows users to delete KYC information.</p>
+<h3 id='http-request-13'>HTTP Request</h3>
+<p><code>DELETE https://your.relay.server/customer/&lt;account&gt;</code></p>
+<h3 id='url-parameters-10'>URL Parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>account</td>
+<td>The stellar account to delete the KYC information for</td>
+</tr>
+</tbody></table>
 <h1 id='deposit-2'>Deposit</h1><h2 id='deposit-destination'>Deposit Destination</h2>
 <blockquote>
-<p>Returns JSON structured like this:</p>
+<p>If KYC is required, returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fields"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"family_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"given_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"address"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>On success, returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unique_destination_reference"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Generates a new unique deposit destination and returns the reference. The reference should be a string that a user will recognize as identifying a particular destination.</p>
-<h3 id='http-request-10'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Deposit/Destination</code></p>
+
+<p>If KYC is required, should return the fields that are required from the <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md">sep9 superset</a></p>
+<h3 id='http-request-14'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/deposit/destination</code></p>
 <h2 id='deposit-instructions'>Deposit Instructions</h2>
 <blockquote>
-<p>Returns JSON structured like this:</p>
+<p>If KYC is required, returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fields"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"family_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"given_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"address"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>On success, returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
@@ -1026,8 +1271,10 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a set of corresponding instructions for a specific deposit destination.</p>
-<h3 id='http-request-11'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Deposit/Instructions</code></p>
+
+<p>If KYC is required, should return the fields that are required from the <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md">sep9 superset</a></p>
+<h3 id='http-request-15'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/deposit/instructions</code></p>
 <h3 id='query-parameters-9'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -1063,8 +1310,8 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <aside class="notice">
 There are two identifying properties on a deposit and withdrawal from a relay server,namely <code>id</code> and <code>reference</code>. <code>id</code> is the property that is viewable in the external system (e.g. a bitcoin transaction hash). Sometimes, an id may be null on an icomplete transaction. A reference MUST be specified. It is the relay server's reference to the transaction.
 </aside>
-<h3 id='http-request-12'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Deposit</code></p>
+<h3 id='http-request-16'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/deposit</code></p>
 <h3 id='query-parameters-10'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -1079,15 +1326,25 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </tbody></table>
 <h1 id='withdrawal-2'>Withdrawal</h1><h2 id='withdrawal-destination'>Withdrawal Destination</h2>
 <blockquote>
-<p>Returns JSON structured like this:</p>
+<p>If KYC is required, returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fields"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"family_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"given_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"address"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>On success, returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"reference"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unique_destination_reference"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a withdrawal reference for a withdrawal destination. Should return a <code>200</code> status code if the destination is valid, otherwise a <code>400</code> status code if the destination parameters are invalid, incomplete or missing with a <code>message</code> field as to what is incorrect.</p>
-<h3 id='http-request-13'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Withdraw/Destination</code></p>
+
+<p>If KYC is required, should return the fields that are required from the <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md">sep9 superset</a></p>
+<h3 id='http-request-17'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/withdraw/destination</code></p>
 <h3 id='query-parameters-11'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -1110,7 +1367,15 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </tbody></table>
 <h2 id='withdrawal-instructions'>Withdrawal Instructions</h2>
 <blockquote>
-<p>Returns JSON structured like this:</p>
+<p>If KYC is required, returns JSON structured like this:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"fields"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"family_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"given_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"address"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>On success, returns JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"min_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
@@ -1121,8 +1386,10 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns withdrawal instructions for a withdrawal destination references as generated by <a href="#withdrawal-destination">withdrawal destination</a>.</p>
-<h3 id='http-request-14'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Withdraw/Instructions</code></p>
+
+<p>If KYC is required, should return the fields that are required from the <a href="https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0009.md">sep9 superset</a></p>
+<h3 id='http-request-18'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/withdraw/instructions</code></p>
 <h3 id='query-parameters-12'>Query Parameters</h3>
 <table><thead>
 <tr>
@@ -1156,9 +1423,9 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Returns a withdrawal.</p>
-<h3 id='http-request-15'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Withdrawal</code></p>
-<h3 id='url-parameters-9'>URL Parameters</h3>
+<h3 id='http-request-19'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/withdrawal</code></p>
+<h3 id='url-parameters-11'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1185,9 +1452,9 @@ There are two identifying properties on a deposit and withdrawal from a relay se
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <p>Sends a withdrawal.</p>
-<h3 id='http-request-16'>HTTP Request</h3>
-<p><code>GET https://your.relay.server/Withdraw/Send</code></p>
-<h3 id='url-parameters-10'>URL Parameters</h3>
+<h3 id='http-request-20'>HTTP Request</h3>
+<p><code>GET https://your.relay.server/withdraw/send</code></p>
+<h3 id='url-parameters-12'>URL Parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1246,7 +1513,6 @@ This error section is stored in a separate file in <code>includes/_errors.md</co
       <div class="dark-box">
           <div class="lang-selector">
                 <a href="#" data-language-name="javascript">javascript</a>
-                <a href="#" data-language-name="shell">shell</a>
           </div>
       </div>
     </div>
