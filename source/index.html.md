@@ -63,15 +63,24 @@ Requests throttled by the rate limiter will be returned with a 429 Too Many Requ
 
 # Authentication
 
-> Authentication via the SDK requires a little initial configuration:
+A3S's endpoints are authenticated for two client types:
+
+1. Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a `Signature` header. A3S will check to see that the `Signature` header matches a corresponding url signed by the relay server's account signing key.
+2. Accounts (or individual users) - accounts access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the [token endpoint](#get-token).
+
+## Relay Client
+
+> Authentication for a relay client requires some configuration:
 
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-a3s.useProd();
-a3s.configure({
-  requestSigningSecretKey: 'XXX'
-});
+a3s
+  .useProd()
+  .useAsRelay()
+  .configure({
+    secret: 'RequestSigningSecretKey'
+  });
 ```
 
 > Then, the SDK can be used to produce an arbitrary signature:
@@ -85,15 +94,40 @@ let signature = await a3s.connectionManager.signUriAndQuery(uri, query);
 ```javascript
 let transaction = await a3s.transaction(assetIssuer, {id: 123});
 ```
+Relay clients (i.e. relay servers contacting A3S), authenticate by signing the url and any query parameters with a request signing secret key.
 
-A3S's endpoints are authenticated for two client types:
-
-1. Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a `Signature` header. A3S will check to see that the `Signature` header matches a corresponding url signed by the relay server's account signing key.
-2. Users - users access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the [token endpoint](#get-token).
-
-<aside class="success">
 In practice, if you are developing a relay server, if you use the A3S sdk, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.
-</aside>
+
+## Account Client
+
+> Authentication for an account client requires some configuration:
+
+```javascript
+const {A3S} = require('a3s');
+const a3s = new A3S();
+a3s
+  .useProd()
+  .useAsAccount()
+  .configure({
+    secret: 'AccountSecretKey'
+  });
+```
+
+> Then, the SDK can be used to get a JWT for authentication:
+
+```javascript
+let signature = await a3s.tokenProvider.token(assetIssuer);
+```
+
+> Or fetch data using this authentication automatically under the hood:
+
+```javascript
+let transaction = await a3s.transaction(assetIssuer, {id: 123});
+```
+
+Account clients (i.e. individual users), authenticate to A3S by proving their ownership over that specific account by signing a dummy transaction. Then, they are provided with a JSON web token specific to that account. They use that JWT to authenticate to A3S.
+
+In practice, if you use the A3S sdk as an account client, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.
 
 # Response Signing
 
@@ -102,10 +136,12 @@ In practice, if you are developing a relay server, if you use the A3S sdk, all m
 ```javascript
 const {A3S} = require('a3s');
 const a3s = new A3S();
-a3s.useProd();
-a3s.configure({
-  requestSigningSecretKey: 'XXX'
-});
+a3s
+  .useProd()
+  .useAsRelay()
+  .configure({
+    secret: 'RequestSigningSecretKey'
+  });
 ```
 
 > Then, the SDK can be used to produce a signature for an arbitrary nonce and payload:
@@ -166,11 +202,25 @@ npm install a3s
 const {A3S} = require('a3s');
 const a3s = new A3S();
 a3s.configure({
-    requestSigningSecretKey: 'XXX'
+    secret: 'XXX'
 })
 ```
 
-# Sandbox Environment
+# Client Types
+
+> If you are a relay server client:
+
+```javascript
+a3s.useAsRelay();
+```
+
+> If you are a regular user/account client:
+
+```javascript
+a3s.useAsAccount();
+```
+
+# Environments
 
 > To use the sandbox with the a3s sdk:
 
@@ -255,8 +305,6 @@ transaction | The signed transaction obtained from the [challenge endpoint](#cha
 ## Get Info
 
 ```javascript
-const {A3S} = require('a3s');
-const a3s = new A3S();
 let info = await a3s.info(assetIssuer);
 ```
 
@@ -764,7 +812,9 @@ To get started building a relay server, you can check out our [relay-server-skel
 ```javascript
 require {A3S} from 'a3s'
 const a3s = new A3S();
-a3s.useProd();
+a3s
+  .useProd()
+  .useAsRelay();
 
 verificationResult = await a3s.connectionManager.verifyRequestByUriAndQuerySignature(req);
 
@@ -778,7 +828,9 @@ if (!verificationResult || !verificationResult.verified) {
 ```javascript
 require {A3S} from 'a3s'
 const a3s = new A3S();
-a3s.useProd();
+a3s
+  .useProd()
+  .useAsRelay();
 
 verificationResult = await a3s.connectionManager.verifyRequestByJWT(req);
 

@@ -234,6 +234,14 @@
           </li>
           <li>
             <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#relay-client" class="toc-h2 toc-link" data-title="Relay Client">Relay Client</a>
+                  </li>
+                  <li>
+                    <a href="#account-client" class="toc-h2 toc-link" data-title="Account Client">Account Client</a>
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#response-signing" class="toc-h1 toc-link" data-title="Response Signing">Response Signing</a>
@@ -251,7 +259,10 @@
             <a href="#getting-started" class="toc-h1 toc-link" data-title="Getting Started">Getting Started</a>
           </li>
           <li>
-            <a href="#sandbox-environment" class="toc-h1 toc-link" data-title="Sandbox Environment">Sandbox Environment</a>
+            <a href="#client-types" class="toc-h1 toc-link" data-title="Client Types">Client Types</a>
+          </li>
+          <li>
+            <a href="#environments" class="toc-h1 toc-link" data-title="Environments">Environments</a>
           </li>
           <li>
             <a href="#tokens" class="toc-h1 toc-link" data-title="Tokens">Tokens</a>
@@ -423,15 +434,24 @@ This is a simple case, describing a 1-to-1 issuance. A3S features certain flexib
 
 <p>Requests throttled by the rate limiter will be returned with a 429 Too Many Requests response. Information regarding your rate limiter quote is present on responses through the X-Ratelimit-* headers.</p>
 <h1 id='security'>Security</h1><h1 id='authentication'>Authentication</h1>
+<p>A3S&#39;s endpoints are authenticated for two client types:</p>
+
+<ol>
+<li>Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a <code>Signature</code> header. A3S will check to see that the <code>Signature</code> header matches a corresponding url signed by the relay server&#39;s account signing key.</li>
+<li>Accounts (or individual users) - accounts access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the <a href="#get-token">token endpoint</a>.</li>
+</ol>
+<h2 id='relay-client'>Relay Client</h2>
 <blockquote>
-<p>Authentication via the SDK requires a little initial configuration:</p>
+<p>Authentication for a relay client requires some configuration:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
-  <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
-<span class="p">});</span>
+<span class="nx">a3s</span>
+  <span class="p">.</span><span class="nx">useProd</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">useAsRelay</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+    <span class="na">secret</span><span class="p">:</span> <span class="s1">'RequestSigningSecretKey'</span>
+  <span class="p">});</span>
 </code></pre>
 <blockquote>
 <p>Then, the SDK can be used to produce an arbitrary signature:</p>
@@ -443,26 +463,47 @@ This is a simple case, describing a 1-to-1 issuance. A3S features certain flexib
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">,</span> <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">});</span>
 </code></pre>
-<p>A3S&#39;s endpoints are authenticated for two client types:</p>
+<p>Relay clients (i.e. relay servers contacting A3S), authenticate by signing the url and any query parameters with a request signing secret key.</p>
 
-<ol>
-<li>Relay Servers - relay server access a set of endpoints on A3S using a request signing method. Using their request signing key, a relay server will sign the url it is accessing and include that as a <code>Signature</code> header. A3S will check to see that the <code>Signature</code> header matches a corresponding url signed by the relay server&#39;s account signing key.</li>
-<li>Users - users access a limited set of endpoints (just transactions and deposit/withdrawal destinations) on A3S using JSON web tokens obtained from the <a href="#get-token">token endpoint</a>.</li>
-</ol>
+<p>In practice, if you are developing a relay server, if you use the A3S sdk, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.</p>
+<h2 id='account-client'>Account Client</h2>
+<blockquote>
+<p>Authentication for an account client requires some configuration:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
+<span class="nx">a3s</span>
+  <span class="p">.</span><span class="nx">useProd</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">useAsAccount</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+    <span class="na">secret</span><span class="p">:</span> <span class="s1">'AccountSecretKey'</span>
+  <span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Then, the SDK can be used to get a JWT for authentication:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">tokenProvider</span><span class="p">.</span><span class="nx">token</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Or fetch data using this authentication automatically under the hood:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">,</span> <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">});</span>
+</code></pre>
+<p>Account clients (i.e. individual users), authenticate to A3S by proving their ownership over that specific account by signing a dummy transaction. Then, they are provided with a JSON web token specific to that account. They use that JWT to authenticate to A3S.</p>
 
-<aside class="success">
-In practice, if you are developing a relay server, if you use the A3S sdk, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.
-</aside>
+<p>In practice, if you use the A3S sdk as an account client, all methods have the authentication built in. You do not need to manually implement this signature authentication yourself.</p>
 <h1 id='response-signing'>Response Signing</h1>
 <blockquote>
 <p>Response signing via the SDK requires a little initial configuration:</p>
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
-  <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
-<span class="p">});</span>
+<span class="nx">a3s</span>
+  <span class="p">.</span><span class="nx">useProd</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">useAsRelay</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+    <span class="na">secret</span><span class="p">:</span> <span class="s1">'RequestSigningSecretKey'</span>
+  <span class="p">});</span>
 </code></pre>
 <blockquote>
 <p>Then, the SDK can be used to produce a signature for an arbitrary nonce and payload:</p>
@@ -511,9 +552,19 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
 <span class="nx">a3s</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
-    <span class="na">requestSigningSecretKey</span><span class="p">:</span> <span class="s1">'XXX'</span>
+    <span class="na">secret</span><span class="p">:</span> <span class="s1">'XXX'</span>
 <span class="p">})</span>
-</code></pre><h1 id='sandbox-environment'>Sandbox Environment</h1>
+</code></pre><h1 id='client-types'>Client Types</h1>
+<blockquote>
+<p>If you are a relay server client:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">a3s</span><span class="p">.</span><span class="nx">useAsRelay</span><span class="p">();</span>
+</code></pre>
+<blockquote>
+<p>If you are a regular user/account client:</p>
+</blockquote>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">a3s</span><span class="p">.</span><span class="nx">useAsAccount</span><span class="p">();</span>
+</code></pre><h1 id='environments'>Environments</h1>
 <blockquote>
 <p>To use the sandbox with the a3s sdk:</p>
 </blockquote>
@@ -589,9 +640,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <td>The signed transaction obtained from the <a href="#challenge-endpoint">challenge endpoint</a>.</td>
 </tr>
 </tbody></table>
-<h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'a3s'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">);</span>
+<h1 id='info'>Info</h1><h2 id='get-info'>Get Info</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="nx">assetIssuer</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>The above command returns JSON structured like this:</p>
@@ -1160,7 +1209,9 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="nx">require</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'a3s'</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+<span class="nx">a3s</span>
+  <span class="p">.</span><span class="nx">useProd</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">useAsRelay</span><span class="p">();</span>
 
 <span class="nx">verificationResult</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">verifyRequestByUriAndQuerySignature</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
 
@@ -1173,7 +1224,9 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </blockquote>
 <pre class="highlight javascript tab-javascript"><code><span class="nx">require</span> <span class="p">{</span><span class="nx">A3S</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'a3s'</span>
 <span class="kr">const</span> <span class="nx">a3s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A3S</span><span class="p">();</span>
-<span class="nx">a3s</span><span class="p">.</span><span class="nx">useProd</span><span class="p">();</span>
+<span class="nx">a3s</span>
+  <span class="p">.</span><span class="nx">useProd</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">useAsRelay</span><span class="p">();</span>
 
 <span class="nx">verificationResult</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">a3s</span><span class="p">.</span><span class="nx">connectionManager</span><span class="p">.</span><span class="nx">verifyRequestByJWT</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
 
