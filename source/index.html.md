@@ -36,22 +36,29 @@ Relay Server:
 * Sense deposits externally and communicate them to A3S.
 * Execute withdrawals of asset as instructed by A3S.
 
-The full deposit/withdrawal flow is as follows:
+The full deposit flow is as follows:
 
-1. User/Client Application would like to deposit asset ABC to Stellar account XYZ. It requests deposit destination from A3S.
-2. A3S provides deposit destination if it has been previously used for a deposit, or it makes a request from relay server to generate a new one.
-3. User/Client Application sends deposit to provided deposit destination.
-4. Relay server observes deposit has been made, and notifies A3S of deposit destination and amount.
-5. A3S issues appropriate amount of tokens to Stellar account XYZ. 
+1. User/Client (e.g. Stellar wallet or Dapp) would like to deposit asset ABC to Stellar account XYZ. User/Client [requests deposit instructions](#get-deposit-instructions) from A3S.
+2. A3S checks if it already has a deposit destination linked to Stellar account XYZ. If not, it asks relay server for asset ABC to [create a new unique deposit destination](#deposit-destination) which it then links to Stellar account ABC.
+3. A3S [asks the relay server for deposit instructions](#deposit-instructions) for deposit destination linked with Stellar account XYZ (e.g. fees, eta etc.).
+5. A3S returns deposit instructions to User/Client (i.e. destination, fees, any additional fields that need to be filled out etc.).
+6. User/Client sends deposit to provided deposit destination.
+7. Relay server observes deposit has been made, and [notifies A3S that a deposit has been recieved](#notify-deposit-received) along with the deposit destination and amount.
+8. Once the deposit is confirmed, relay server [notifies A3S that a deposit is confirmed](#notify-deposit-received) along with the deposit destination and amount.
+9. A3S issues appropriate amount of ABC tokens to Stellar account XYZ. 
 
 <aside class="notice">
 This is a simple case, describing a 1-to-1 issuance. A3S features certain flexibilites, too. A3S may remove deposit fees (depending on the asset settings). A3S may create the receiving Stellar account by selling some of the deposited asset on the open market to initially fund the account with the acquired XLM. A3S will also wait and sense for a trustline to be set up, and then issue the balance of the asset due the account.
 </aside>
 
-6. User/Client Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.
-7. A3S generates withdrawal destination and provides it to User/Client Application.
-8. User/Client Application sends ABC tokens on the Stellar network to withdrawal destination provided by A3S.
-9. A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.
+The full withdrawal flow is as follows:
+
+1. User/Client would like to withdraw asset ABC to external account GHI. User/Client [requests withdrawal destination from A3S](#get-withdrawal-instructions).
+2. A3S [requests withdrawal instructions from relay server](#withdrawal-instructions) (e.g. eta and fees).
+3. A3S checks if a withdrawal account/memo is already linked with external account GHI, if not it generates a new one.
+4. A3S returns withdrawal instructions to User/Client (i.e. Stellar account, memo, eta, fees etc.)
+5. User/Client Application sends ABC tokens on the Stellar network to withdrawal account/memo provided by A3S.
+9. A3S automatically registers incoming withdrawal, and [notifies relay server to execute withdrawal](#send-withdrawal) to external account GHI.
 10. Relay server executes withdrawal to external account GHI.
 
 # Rate Limiting
@@ -880,7 +887,7 @@ account | The stellar account to delete the KYC information for
 
 ## Deposit Destination
 
-> If KYC is required, returns JSON structured like this:
+> If KYC is required, returns a 403 (Forbidden) with JSON structured like this:
 
 ```json
 {
@@ -907,7 +914,7 @@ If KYC is required, should return the fields that are required from the [sep9 su
 
 ## Deposit Instructions
 
-> If KYC is required, returns JSON structured like this:
+> If KYC is required, returns a 403 (Forbidden) with JSON structured like this:
 
 ```json
 {
