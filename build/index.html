@@ -408,25 +408,32 @@
 <li>Execute withdrawals of asset as instructed by A3S.</li>
 </ul>
 
-<p>The full deposit/withdrawal flow is as follows:</p>
+<p>The full deposit flow is as follows:</p>
 
 <ol>
-<li>User/Client Application would like to deposit asset ABC to Stellar account XYZ. It requests deposit destination from A3S.</li>
-<li>A3S provides deposit destination if it has been previously used for a deposit, or it makes a request from relay server to generate a new one.</li>
-<li>User/Client Application sends deposit to provided deposit destination.</li>
-<li>Relay server observes deposit has been made, and notifies A3S of deposit destination and amount.</li>
-<li>A3S issues appropriate amount of tokens to Stellar account XYZ. </li>
+<li>User/Client (e.g. Stellar wallet or Dapp) would like to deposit asset ABC to Stellar account XYZ. User/Client <a href="#get-deposit-instructions">requests deposit instructions</a> from A3S.</li>
+<li>A3S checks if it already has a deposit destination linked to Stellar account XYZ. If not, it asks relay server for asset ABC to <a href="#deposit-destination">create a new unique deposit destination</a> which it then links to Stellar account ABC.</li>
+<li>A3S <a href="#deposit-instructions">asks the relay server for deposit instructions</a> for deposit destination linked with Stellar account XYZ (e.g. fees, eta etc.).</li>
+<li>A3S returns deposit instructions to User/Client (i.e. destination, fees, any additional fields that need to be filled out etc.).</li>
+<li>User/Client sends deposit to provided deposit destination.</li>
+<li>Relay server observes deposit has been made, and <a href="#notify-deposit-received">notifies A3S that a deposit has been recieved</a> along with the deposit destination and amount.</li>
+<li>Once the deposit is confirmed, relay server <a href="#notify-deposit-received">notifies A3S that a deposit is confirmed</a> along with the deposit destination and amount.</li>
+<li>A3S issues appropriate amount of ABC tokens to Stellar account XYZ. </li>
 </ol>
 
 <aside class="notice">
 This is a simple case, describing a 1-to-1 issuance. A3S features certain flexibilites, too. A3S may remove deposit fees (depending on the asset settings). A3S may create the receiving Stellar account by selling some of the deposited asset on the open market to initially fund the account with the acquired XLM. A3S will also wait and sense for a trustline to be set up, and then issue the balance of the asset due the account.
 </aside>
 
+<p>The full withdrawal flow is as follows:</p>
+
 <ol>
-<li>User/Client Application would like to withdraw asset ABC to external account GHI. User/Client Application requests withdrawal destination from A3S.</li>
-<li>A3S generates withdrawal destination and provides it to User/Client Application.</li>
-<li>User/Client Application sends ABC tokens on the Stellar network to withdrawal destination provided by A3S.</li>
-<li>A3S automatically registers incoming withdrawal, and notifies relay server to execute withdrawal to external account GHI.</li>
+<li>User/Client would like to withdraw asset ABC to external account GHI. User/Client <a href="#get-withdrawal-instructions">requests withdrawal destination from A3S</a>.</li>
+<li>A3S <a href="#withdrawal-instructions">requests withdrawal instructions from relay server</a> (e.g. eta and fees).</li>
+<li>A3S checks if a withdrawal account/memo is already linked with external account GHI, if not it generates a new one.</li>
+<li>A3S returns withdrawal instructions to User/Client (i.e. Stellar account, memo, eta, fees etc.)</li>
+<li>User/Client Application sends ABC tokens on the Stellar network to withdrawal account/memo provided by A3S.</li>
+<li>A3S automatically registers incoming withdrawal, and <a href="#send-withdrawal">notifies relay server to execute withdrawal</a> to external account GHI.</li>
 <li>Relay server executes withdrawal to external account GHI.</li>
 </ol>
 <h1 id='rate-limiting'>Rate Limiting</h1>
@@ -1283,7 +1290,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 </tbody></table>
 <h1 id='deposit-2'>Deposit</h1><h2 id='deposit-destination'>Deposit Destination</h2>
 <blockquote>
-<p>If KYC is required, returns JSON structured like this:</p>
+<p>If KYC is required, returns a 403 (Forbidden) with JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
@@ -1304,7 +1311,7 @@ In practice, if you use the A3S sdk, all methods have the message verification b
 <p><code>GET https://your.relay.server/deposit/destination</code></p>
 <h2 id='deposit-instructions'>Deposit Instructions</h2>
 <blockquote>
-<p>If KYC is required, returns JSON structured like this:</p>
+<p>If KYC is required, returns a 403 (Forbidden) with JSON structured like this:</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_interactive_customer_info_needed"</span><span class="p">,</span><span class="w">
